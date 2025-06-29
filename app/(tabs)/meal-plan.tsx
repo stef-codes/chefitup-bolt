@@ -6,14 +6,43 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle, Edit3 } from 'lucide-react-native';
+import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
+
+interface Recipe {
+  id: number;
+  name: string;
+  image: string;
+  carbs: number;
+  protein: number;
+  calories: number;
+  prepTime: number;
+  servings: number;
+  glycemicIndex: string;
+  category: string;
+  difficulty: string;
+  isFavorite: boolean;
+}
+
+interface MealPlan {
+  [day: string]: {
+    [mealType: string]: Recipe;
+  };
+}
 
 const MealPlanScreen = () => {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedDay, setSelectedDay] = useState(0);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [customizationModalVisible, setCustomizationModalVisible] = useState(false);
+  const [selectedMealSlot, setSelectedMealSlot] = useState<{
+    day: string;
+    mealType: string;
+    currentRecipe: Recipe | null;
+  } | null>(null);
 
   // Update current date every minute to keep it accurate
   useEffect(() => {
@@ -36,31 +65,49 @@ const MealPlanScreen = () => {
   const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const mealTypes = ['Breakfast', 'Lunch', 'Dinner'];
 
-  const mealPlan = {
+  const [mealPlan, setMealPlan] = useState<MealPlan>({
     Monday: {
       Breakfast: {
         id: 1,
         name: 'Greek Yogurt Parfait with Berries',
         image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
         carbs: 28,
+        protein: 20,
+        calories: 180,
         prepTime: 10,
         servings: 1,
+        glycemicIndex: 'Medium',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
       Lunch: {
         id: 2,
         name: 'Mediterranean Quinoa Bowl',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 35,
+        protein: 12,
+        calories: 320,
         prepTime: 25,
         servings: 2,
+        glycemicIndex: 'Low',
+        category: 'Lunch',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Dinner: {
         id: 3,
         name: 'Herb-Crusted Salmon with Vegetables',
         image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
         carbs: 12,
+        protein: 32,
+        calories: 380,
         prepTime: 30,
         servings: 4,
+        glycemicIndex: 'Very Low',
+        category: 'Dinner',
+        difficulty: 'Medium',
+        isFavorite: false,
       },
     },
     Tuesday: {
@@ -69,24 +116,42 @@ const MealPlanScreen = () => {
         name: 'Almond Flour Pancakes',
         image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg',
         carbs: 22,
+        protein: 16,
+        calories: 350,
         prepTime: 15,
         servings: 2,
+        glycemicIndex: 'Low',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
       Lunch: {
         id: 5,
         name: 'Cauliflower Rice Stir-Fry',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 18,
+        protein: 14,
+        calories: 280,
         prepTime: 20,
         servings: 3,
+        glycemicIndex: 'Low',
+        category: 'Lunch',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Dinner: {
         id: 6,
         name: 'Zucchini Noodle Bolognese',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 15,
+        protein: 25,
+        calories: 290,
         prepTime: 35,
         servings: 4,
+        glycemicIndex: 'Low',
+        category: 'Dinner',
+        difficulty: 'Medium',
+        isFavorite: true,
       },
     },
     Wednesday: {
@@ -95,24 +160,42 @@ const MealPlanScreen = () => {
         name: 'Chia Seed Pudding Bowl',
         image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
         carbs: 18,
+        protein: 12,
+        calories: 280,
         prepTime: 5,
         servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Lunch: {
         id: 8,
         name: 'Grilled Chicken Caesar Salad',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 12,
+        protein: 35,
+        calories: 320,
         prepTime: 20,
         servings: 1,
+        glycemicIndex: 'Very Low',
+        category: 'Lunch',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
       Dinner: {
         id: 9,
         name: 'Stuffed Bell Peppers',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 22,
+        protein: 20,
+        calories: 310,
         prepTime: 45,
         servings: 4,
+        glycemicIndex: 'Low',
+        category: 'Dinner',
+        difficulty: 'Medium',
+        isFavorite: true,
       },
     },
     Thursday: {
@@ -121,24 +204,42 @@ const MealPlanScreen = () => {
         name: 'Veggie Scrambled Eggs',
         image: 'https://images.pexels.com/photos/824635/pexels-photo-824635.jpeg',
         carbs: 8,
+        protein: 24,
+        calories: 290,
         prepTime: 12,
         servings: 2,
+        glycemicIndex: 'Very Low',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
       Lunch: {
         id: 11,
         name: 'Turkey and Hummus Wrap',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 28,
+        protein: 24,
+        calories: 380,
         prepTime: 10,
         servings: 1,
+        glycemicIndex: 'Medium',
+        category: 'Lunch',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Dinner: {
         id: 12,
         name: 'Baked Cod with Roasted Vegetables',
         image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
         carbs: 16,
+        protein: 28,
+        calories: 290,
         prepTime: 35,
         servings: 3,
+        glycemicIndex: 'Low',
+        category: 'Dinner',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
     },
     Friday: {
@@ -147,24 +248,42 @@ const MealPlanScreen = () => {
         name: 'Protein Smoothie Bowl',
         image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
         carbs: 26,
+        protein: 22,
+        calories: 340,
         prepTime: 10,
         servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Lunch: {
         id: 14,
         name: 'Hearty Lentil Soup',
         image: 'https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg',
         carbs: 32,
+        protein: 16,
+        calories: 290,
         prepTime: 35,
         servings: 4,
+        glycemicIndex: 'Low',
+        category: 'Lunch',
+        difficulty: 'Medium',
+        isFavorite: false,
       },
       Dinner: {
         id: 15,
         name: 'Turkey Meatballs with Marinara',
         image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
         carbs: 18,
+        protein: 26,
+        calories: 320,
         prepTime: 30,
         servings: 4,
+        glycemicIndex: 'Low',
+        category: 'Dinner',
+        difficulty: 'Medium',
+        isFavorite: true,
       },
     },
     Saturday: {
@@ -173,24 +292,42 @@ const MealPlanScreen = () => {
         name: 'Avocado Toast with Poached Egg',
         image: 'https://images.pexels.com/photos/566566/pexels-photo-566566.jpeg',
         carbs: 24,
+        protein: 18,
+        calories: 380,
         prepTime: 8,
         servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
       Lunch: {
         id: 17,
         name: 'Colorful Buddha Bowl',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 38,
+        protein: 14,
+        calories: 410,
         prepTime: 30,
         servings: 2,
+        glycemicIndex: 'Low',
+        category: 'Lunch',
+        difficulty: 'Medium',
+        isFavorite: true,
       },
       Dinner: {
         id: 18,
         name: 'Grilled Chicken Thighs',
         image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
         carbs: 6,
+        protein: 38,
+        calories: 420,
         prepTime: 25,
         servings: 4,
+        glycemicIndex: 'Very Low',
+        category: 'Dinner',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
     },
     Sunday: {
@@ -199,27 +336,45 @@ const MealPlanScreen = () => {
         name: 'Steel Cut Oatmeal Bowl',
         image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
         carbs: 35,
+        protein: 8,
+        calories: 250,
         prepTime: 25,
         servings: 1,
+        glycemicIndex: 'Medium',
+        category: 'Breakfast',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Lunch: {
         id: 20,
         name: 'Chickpea Salad Sandwich',
         image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
         carbs: 42,
+        protein: 18,
+        calories: 390,
         prepTime: 15,
         servings: 2,
+        glycemicIndex: 'Medium',
+        category: 'Lunch',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
       Dinner: {
         id: 21,
         name: 'Herb-Crusted Pork Tenderloin',
         image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
         carbs: 8,
+        protein: 34,
+        calories: 380,
         prepTime: 40,
         servings: 4,
+        glycemicIndex: 'Very Low',
+        category: 'Dinner',
+        difficulty: 'Medium',
+        isFavorite: true,
       },
     },
-  };
+  });
 
   const prepSchedule = [
     {
@@ -244,12 +399,31 @@ const MealPlanScreen = () => {
     },
   ];
 
-  const weeklyStats = {
-    totalCarbs: 485,
-    avgDailyCarbs: 138,
-    prepTime: 4.2,
-    variety: 21,
+  const calculateWeeklyStats = () => {
+    let totalCarbs = 0;
+    let totalCalories = 0;
+    let totalPrepTime = 0;
+    let recipeCount = 0;
+
+    Object.values(mealPlan).forEach(day => {
+      Object.values(day).forEach(meal => {
+        totalCarbs += meal.carbs;
+        totalCalories += meal.calories;
+        totalPrepTime += meal.prepTime;
+        recipeCount++;
+      });
+    });
+
+    return {
+      totalCarbs,
+      avgDailyCarbs: Math.round(totalCarbs / 7),
+      prepTime: Math.round(totalPrepTime / 60 * 10) / 10, // Convert to hours
+      variety: recipeCount,
+      avgCalories: Math.round(totalCalories / 7),
+    };
   };
+
+  const weeklyStats = calculateWeeklyStats();
 
   const navigateWeek = (direction: number) => {
     setSelectedWeek(selectedWeek + direction);
@@ -305,6 +479,49 @@ const MealPlanScreen = () => {
     });
   };
 
+  const handleMealCustomization = (day: string, mealType: string) => {
+    const currentRecipe = mealPlan[day]?.[mealType] || null;
+    setSelectedMealSlot({ day, mealType, currentRecipe });
+    setCustomizationModalVisible(true);
+  };
+
+  const handleRecipeSelect = (recipe: Recipe, mealType: string, day: string) => {
+    setMealPlan(prevPlan => ({
+      ...prevPlan,
+      [day]: {
+        ...prevPlan[day],
+        [mealType]: recipe,
+      },
+    }));
+    
+    Alert.alert(
+      'Recipe Updated!',
+      `${recipe.name} has been added to ${day} ${mealType}`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const generateRandomMealPlan = () => {
+    Alert.alert(
+      'Generate New Meal Plan',
+      'This will replace your current meal plan with new recipe suggestions. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Generate', 
+          onPress: () => {
+            // In a real app, this would call an API to generate a new meal plan
+            Alert.alert(
+              'Meal Plan Generated!',
+              'Your new meal plan has been created with fresh recipe suggestions.',
+              [{ text: 'OK' }]
+            );
+          }
+        },
+      ]
+    );
+  };
+
   const currentDayName = weekDays[selectedDay];
   const currentDayMeals = mealPlan[currentDayName];
   const selectedDayDate = getDateForDay(selectedDay);
@@ -341,7 +558,16 @@ const MealPlanScreen = () => {
 
         {/* Weekly Stats */}
         <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Weekly Overview</Text>
+          <View style={styles.statsHeader}>
+            <Text style={styles.statsTitle}>Weekly Overview</Text>
+            <TouchableOpacity 
+              style={styles.regenerateButton}
+              onPress={generateRandomMealPlan}
+            >
+              <Shuffle size={16} color="#16A34A" />
+              <Text style={styles.regenerateText}>Regenerate</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{weeklyStats.totalCarbs}g</Text>
@@ -410,22 +636,40 @@ const MealPlanScreen = () => {
 
         {/* Daily Meals */}
         <View style={styles.dailyMealsCard}>
-          <Text style={styles.dailyMealsTitle}>
-            {currentDayName}'s Meals
-            {isToday(selectedDay) && (
-              <Text style={styles.todayMealsLabel}> (Today)</Text>
-            )}
-          </Text>
+          <View style={styles.dailyMealsHeader}>
+            <Text style={styles.dailyMealsTitle}>
+              {currentDayName}'s Meals
+              {isToday(selectedDay) && (
+                <Text style={styles.todayMealsLabel}> (Today)</Text>
+              )}
+            </Text>
+            <TouchableOpacity style={styles.customizeAllButton}>
+              <Edit3 size={16} color="#16A34A" />
+              <Text style={styles.customizeAllText}>Customize</Text>
+            </TouchableOpacity>
+          </View>
           
           {mealTypes.map((mealType) => {
             const meal = currentDayMeals?.[mealType];
             
             return (
               <View key={mealType} style={styles.mealSection}>
-                <Text style={styles.mealTypeTitle}>{mealType}</Text>
+                <View style={styles.mealSectionHeader}>
+                  <Text style={styles.mealTypeTitle}>{mealType}</Text>
+                  <TouchableOpacity 
+                    style={styles.swapButton}
+                    onPress={() => handleMealCustomization(currentDayName, mealType)}
+                  >
+                    <Shuffle size={14} color="#16A34A" />
+                    <Text style={styles.swapButtonText}>Swap</Text>
+                  </TouchableOpacity>
+                </View>
                 
                 {meal ? (
-                  <TouchableOpacity style={styles.mealCard}>
+                  <TouchableOpacity 
+                    style={styles.mealCard}
+                    onPress={() => handleMealCustomization(currentDayName, mealType)}
+                  >
                     <Image source={{ uri: meal.image }} style={styles.mealImage} />
                     <View style={styles.mealContent}>
                       <Text style={styles.mealName}>{meal.name}</Text>
@@ -446,7 +690,10 @@ const MealPlanScreen = () => {
                     </View>
                   </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity style={styles.emptyMealCard}>
+                  <TouchableOpacity 
+                    style={styles.emptyMealCard}
+                    onPress={() => handleMealCustomization(currentDayName, mealType)}
+                  >
                     <Plus size={24} color="#9CA3AF" />
                     <Text style={styles.emptyMealText}>Add {mealType.toLowerCase()}</Text>
                   </TouchableOpacity>
@@ -511,7 +758,7 @@ const MealPlanScreen = () => {
                           selectedDay === dayIndex && styles.weekGridMealCellSelected,
                           isToday(dayIndex) && styles.weekGridMealCellToday,
                         ]}
-                        onPress={() => setSelectedDay(dayIndex)}
+                        onPress={() => handleMealCustomization(dayName, mealType)}
                       >
                         {meal ? (
                           <View style={styles.weekGridMealContent}>
@@ -562,10 +809,23 @@ const MealPlanScreen = () => {
             <Text style={styles.primaryButtonText}>Generate Shopping List</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>Customize Plan</Text>
+            <Text style={styles.secondaryButtonText}>Save as Template</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Meal Plan Customization Modal */}
+      <MealPlanCustomizationModal
+        visible={customizationModalVisible}
+        onClose={() => {
+          setCustomizationModalVisible(false);
+          setSelectedMealSlot(null);
+        }}
+        currentRecipe={selectedMealSlot?.currentRecipe || null}
+        mealType={selectedMealSlot?.mealType || ''}
+        day={selectedMealSlot?.day || ''}
+        onRecipeSelect={handleRecipeSelect}
+      />
     </SafeAreaView>
   );
 };
@@ -626,11 +886,30 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  statsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   statsTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
-    marginBottom: 16,
+  },
+  regenerateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#DCFCE7',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  regenerateText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#16A34A',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -727,11 +1006,30 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  dailyMealsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   dailyMealsTitle: {
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
-    marginBottom: 20,
+  },
+  customizeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#DCFCE7',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  customizeAllText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#16A34A',
   },
   todayMealsLabel: {
     fontSize: 16,
@@ -741,11 +1039,30 @@ const styles = StyleSheet.create({
   mealSection: {
     marginBottom: 24,
   },
+  mealSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   mealTypeTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#374151',
-    marginBottom: 12,
+  },
+  swapButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  swapButtonText: {
+    fontSize: 11,
+    fontFamily: 'Inter-SemiBold',
+    color: '#16A34A',
   },
   mealCard: {
     flexDirection: 'row',

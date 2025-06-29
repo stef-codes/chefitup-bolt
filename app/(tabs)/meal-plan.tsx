@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle, Edit3 } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle, CreditCard as Edit3 } from 'lucide-react-native';
 import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
 
 interface Recipe {

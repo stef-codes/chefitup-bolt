@@ -25,9 +25,11 @@ import {
   Heart,
   ChevronLeft,
   ChevronRight,
-  Droplets
+  Droplets,
+  Edit3
 } from 'lucide-react-native';
 import BloodSugarModal from '../../components/BloodSugarModal';
+import CustomMealModal from '../../components/CustomMealModal';
 
 const { width } = Dimensions.get('window');
 
@@ -72,6 +74,7 @@ const NutritionScreen = () => {
   const [bloodSugarReadings, setBloodSugarReadings] = useState<BloodSugarReading[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [bloodSugarModalVisible, setBloodSugarModalVisible] = useState(false);
+  const [customMealModalVisible, setCustomMealModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMealType, setSelectedMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
   const [customServing, setCustomServing] = useState('1');
@@ -275,6 +278,33 @@ const NutritionScreen = () => {
     Alert.alert(
       'Blood Sugar Logged!',
       `Recorded ${reading.value} mg/dL reading`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleCustomMealSave = (customMeal: any) => {
+    const newEntry: NutritionEntry = {
+      id: Date.now(),
+      name: customMeal.name,
+      carbs: customMeal.carbs,
+      protein: customMeal.protein,
+      calories: customMeal.calories,
+      fiber: customMeal.fiber,
+      sugar: customMeal.sugar,
+      serving: customMeal.serving,
+      time: new Date().toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+      mealType: selectedMealType,
+    };
+
+    setDailyEntries([...dailyEntries, newEntry]);
+    setCustomMealModalVisible(false);
+    Alert.alert(
+      'Custom Meal Added!',
+      `${customMeal.name} has been added to your ${selectedMealType.toLowerCase()}`,
       [{ text: 'OK' }]
     );
   };
@@ -496,15 +526,25 @@ const NutritionScreen = () => {
           )}
         </View>
 
-        {/* Quick Add Button */}
+        {/* Quick Add Buttons */}
         <View style={styles.quickAddContainer}>
-          <TouchableOpacity 
-            style={styles.quickAddButton}
-            onPress={() => setAddModalVisible(true)}
-          >
-            <Plus size={20} color="#ffffff" />
-            <Text style={styles.quickAddText}>Log Food</Text>
-          </TouchableOpacity>
+          <View style={styles.quickAddRow}>
+            <TouchableOpacity 
+              style={styles.quickAddButton}
+              onPress={() => setAddModalVisible(true)}
+            >
+              <Search size={20} color="#ffffff" />
+              <Text style={styles.quickAddText}>Search Foods</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.quickAddButton, styles.customMealButton]}
+              onPress={() => setCustomMealModalVisible(true)}
+            >
+              <Edit3 size={20} color="#ffffff" />
+              <Text style={styles.quickAddText}>Custom Meal</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Meals by Type */}
@@ -729,6 +769,14 @@ const NutritionScreen = () => {
         visible={bloodSugarModalVisible}
         onClose={() => setBloodSugarModalVisible(false)}
         onSave={handleBloodSugarSave}
+      />
+
+      {/* Custom Meal Modal */}
+      <CustomMealModal
+        visible={customMealModalVisible}
+        onClose={() => setCustomMealModalVisible(false)}
+        onSave={handleCustomMealSave}
+        mealType={selectedMealType}
       />
     </SafeAreaView>
   );
@@ -1003,24 +1051,34 @@ const styles = StyleSheet.create({
   quickAddContainer: {
     marginBottom: 24,
   },
+  quickAddRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
   quickAddButton: {
     backgroundColor: '#16A34A',
-    borderRadius: 16,
+    borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    flex: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowRadius: 4,
+    elevation: 2,
   },
   quickAddText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
+    marginLeft: 8,
+  },
+  customMealButton: {
+    backgroundColor: '#10B981',
   },
   mealSection: {
     marginBottom: 24,

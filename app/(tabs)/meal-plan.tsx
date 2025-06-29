@@ -856,9 +856,6 @@ const MealPlanScreen = () => {
             <Calendar size={20} color="#ffffff" />
             <Text style={styles.primaryButtonText}>Generate Shopping List</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>Save as Template</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -1286,19 +1283,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
-  },
-  secondaryButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 2,
-    borderColor: '#16A34A',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#16A34A',
   },
 });
 

@@ -53,7 +53,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="meal-plan"
         options={{
-          title: 'Meal Plan',
+          title: 'Meals',
           tabBarIcon: ({ size, color }) => (
             <Calendar size={size} color={color} />
           ),
@@ -62,7 +62,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shopping"
         options={{
-          title: 'Shopping',
+          title: 'Shop',
           tabBarIcon: ({ size, color }) => (
             <ShoppingCart size={size} color={color} />
           ),

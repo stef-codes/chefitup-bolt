@@ -14,7 +14,7 @@ const MealPlanScreen = () => {
   const [selectedWeek, setSelectedWeek] = useState(0);
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner'];
 
   const mealPlan = {
     Mon: {
@@ -69,7 +69,136 @@ const MealPlanScreen = () => {
         servings: 4,
       },
     },
-    // Add more days as needed
+    Wed: {
+      Breakfast: {
+        id: 7,
+        name: 'Chia Seed Pudding',
+        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+        carbs: 18,
+        prepTime: 5,
+        servings: 1,
+      },
+      Lunch: {
+        id: 8,
+        name: 'Grilled Chicken Salad',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 12,
+        prepTime: 20,
+        servings: 1,
+      },
+      Dinner: {
+        id: 9,
+        name: 'Stuffed Bell Peppers',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 22,
+        prepTime: 45,
+        servings: 4,
+      },
+    },
+    Thu: {
+      Breakfast: {
+        id: 10,
+        name: 'Veggie Scrambled Eggs',
+        image: 'https://images.pexels.com/photos/824635/pexels-photo-824635.jpeg',
+        carbs: 8,
+        prepTime: 12,
+        servings: 2,
+      },
+      Lunch: {
+        id: 11,
+        name: 'Turkey and Hummus Wrap',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 28,
+        prepTime: 10,
+        servings: 1,
+      },
+      Dinner: {
+        id: 12,
+        name: 'Baked Cod with Vegetables',
+        image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
+        carbs: 16,
+        prepTime: 35,
+        servings: 3,
+      },
+    },
+    Fri: {
+      Breakfast: {
+        id: 13,
+        name: 'Protein Smoothie Bowl',
+        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+        carbs: 26,
+        prepTime: 10,
+        servings: 1,
+      },
+      Lunch: {
+        id: 14,
+        name: 'Lentil Soup',
+        image: 'https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg',
+        carbs: 32,
+        prepTime: 35,
+        servings: 4,
+      },
+      Dinner: {
+        id: 15,
+        name: 'Turkey Meatballs',
+        image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
+        carbs: 18,
+        prepTime: 30,
+        servings: 4,
+      },
+    },
+    Sat: {
+      Breakfast: {
+        id: 16,
+        name: 'Avocado Toast with Egg',
+        image: 'https://images.pexels.com/photos/566566/pexels-photo-566566.jpeg',
+        carbs: 24,
+        prepTime: 8,
+        servings: 1,
+      },
+      Lunch: {
+        id: 17,
+        name: 'Buddha Bowl',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 38,
+        prepTime: 30,
+        servings: 2,
+      },
+      Dinner: {
+        id: 18,
+        name: 'Grilled Chicken Thighs',
+        image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
+        carbs: 6,
+        prepTime: 25,
+        servings: 4,
+      },
+    },
+    Sun: {
+      Breakfast: {
+        id: 19,
+        name: 'Steel Cut Oatmeal Bowl',
+        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+        carbs: 35,
+        prepTime: 25,
+        servings: 1,
+      },
+      Lunch: {
+        id: 20,
+        name: 'Chickpea Salad Sandwich',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 42,
+        prepTime: 15,
+        servings: 2,
+      },
+      Dinner: {
+        id: 21,
+        name: 'Pork Tenderloin with Herbs',
+        image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
+        carbs: 8,
+        prepTime: 40,
+        servings: 4,
+      },
+    },
   };
 
   const prepSchedule = [
@@ -97,7 +226,7 @@ const MealPlanScreen = () => {
     totalCarbs: 485,
     avgDailyCarbs: 138,
     prepTime: 4.2,
-    variety: 12,
+    variety: 21,
   };
 
   const navigateWeek = (direction: number) => {
@@ -172,54 +301,65 @@ const MealPlanScreen = () => {
           </View>
         </View>
 
-        {/* Days Grid */}
-        <View style={styles.daysGrid}>
-          {weekDays.map((day, dayIndex) => (
-            <View key={day} style={styles.dayColumn}>
-              <View style={[
-                styles.dayHeader,
-                isToday(dayIndex) && styles.todayHeader
-              ]}>
+        {/* Meal Plan Grid - Improved Layout */}
+        <View style={styles.mealPlanCard}>
+          <Text style={styles.mealPlanTitle}>Weekly Meal Plan</Text>
+          
+          {/* Days Header */}
+          <View style={styles.daysHeader}>
+            <View style={styles.mealTypeColumn} />
+            {weekDays.map((day, dayIndex) => (
+              <View key={day} style={styles.dayHeaderCell}>
                 <Text style={[
-                  styles.dayName,
-                  isToday(dayIndex) && styles.todayText
+                  styles.dayHeaderText,
+                  isToday(dayIndex) && styles.todayHeaderText
                 ]}>
                   {day}
                 </Text>
                 <Text style={[
-                  styles.dayDate,
-                  isToday(dayIndex) && styles.todayText
+                  styles.dayHeaderDate,
+                  isToday(dayIndex) && styles.todayHeaderText
                 ]}>
                   {formatDate(dayIndex)}
                 </Text>
               </View>
+            ))}
+          </View>
+
+          {/* Meal Rows */}
+          {mealTypes.map((mealType) => (
+            <View key={mealType} style={styles.mealRow}>
+              <View style={styles.mealTypeColumn}>
+                <Text style={styles.mealTypeText}>{mealType}</Text>
+              </View>
               
-              {mealTypes.map((mealType) => {
+              {weekDays.map((day, dayIndex) => {
                 const meal = mealPlan[day]?.[mealType];
                 
                 return (
-                  <View key={`${day}-${mealType}`} style={styles.mealSlot}>
-                    <Text style={styles.mealTypeLabel}>{mealType}</Text>
+                  <View key={`${day}-${mealType}`} style={[
+                    styles.mealCell,
+                    isToday(dayIndex) && styles.todayMealCell
+                  ]}>
                     {meal ? (
-                      <TouchableOpacity style={styles.mealCard}>
+                      <TouchableOpacity style={styles.mealItem}>
                         <Image source={{ uri: meal.image }} style={styles.mealImage} />
                         <View style={styles.mealInfo}>
                           <Text style={styles.mealName} numberOfLines={2}>
                             {meal.name}
                           </Text>
                           <View style={styles.mealMeta}>
-                            <Text style={styles.mealCarbs}>{meal.carbs}g carbs</Text>
-                            <View style={styles.mealDetails}>
-                              <Clock size={10} color="#6B7280" />
-                              <Text style={styles.mealTime}>{meal.prepTime}m</Text>
+                            <Text style={styles.mealCarbs}>{meal.carbs}g</Text>
+                            <View style={styles.mealTime}>
+                              <Clock size={8} color="#6B7280" />
+                              <Text style={styles.mealTimeText}>{meal.prepTime}m</Text>
                             </View>
                           </View>
                         </View>
                       </TouchableOpacity>
                     ) : (
-                      <TouchableOpacity style={styles.emptyMealSlot}>
-                        <Plus size={20} color="#9CA3AF" />
-                        <Text style={styles.addMealText}>Add meal</Text>
+                      <TouchableOpacity style={styles.emptyMeal}>
+                        <Plus size={16} color="#9CA3AF" />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -343,113 +483,133 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
-  daysGrid: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
-  },
-  dayColumn: {
-    flex: 1,
-    minWidth: 120,
-  },
-  dayHeader: {
-    alignItems: 'center',
-    padding: 12,
+  mealPlanCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    marginBottom: 8,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  todayHeader: {
-    backgroundColor: '#16A34A',
+  mealPlanTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 16,
   },
-  dayName: {
-    fontSize: 14,
+  daysHeader: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  mealTypeColumn: {
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  dayHeaderCell: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    marginHorizontal: 1,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+  },
+  dayHeaderText: {
+    fontSize: 12,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
     marginBottom: 2,
   },
-  dayDate: {
-    fontSize: 12,
+  dayHeaderDate: {
+    fontSize: 10,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
-  todayText: {
-    color: '#ffffff',
+  todayHeaderText: {
+    color: '#16A34A',
   },
-  mealSlot: {
+  mealRow: {
+    flexDirection: 'row',
     marginBottom: 8,
   },
-  mealTypeLabel: {
+  mealTypeText: {
     fontSize: 11,
     fontFamily: 'Inter-SemiBold',
     color: '#6B7280',
-    marginBottom: 4,
+    textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  mealCard: {
+  mealCell: {
+    flex: 1,
+    marginHorizontal: 1,
+    minHeight: 80,
+  },
+  todayMealCell: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#16A34A',
+  },
+  mealItem: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 2,
     elevation: 1,
+    height: '100%',
   },
   mealImage: {
     width: '100%',
-    height: 60,
+    height: 40,
   },
   mealInfo: {
-    padding: 8,
+    padding: 6,
+    flex: 1,
   },
   mealName: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
     marginBottom: 4,
-    lineHeight: 16,
+    lineHeight: 12,
   },
   mealMeta: {
-    gap: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   mealCarbs: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: 'Inter-SemiBold',
     color: '#16A34A',
   },
-  mealDetails: {
+  mealTime: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
   },
-  mealTime: {
-    fontSize: 10,
+  mealTimeText: {
+    fontSize: 8,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
-  emptyMealSlot: {
+  emptyMeal: {
     backgroundColor: '#F9FAFB',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#E5E7EB',
     borderStyle: 'dashed',
     borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
+    height: '100%',
     justifyContent: 'center',
-    minHeight: 80,
-  },
-  addMealText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
-    marginTop: 4,
+    alignItems: 'center',
   },
   prepCard: {
     backgroundColor: '#ffffff',

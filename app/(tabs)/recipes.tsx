@@ -7,17 +7,36 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Filter, Clock, Users, Heart } from 'lucide-react-native';
+import RecipeDetailModal from '../../components/RecipeDetailModal';
+
+interface Recipe {
+  id: number;
+  name: string;
+  image: string;
+  carbs: number;
+  protein: number;
+  calories: number;
+  prepTime: number;
+  servings: number;
+  glycemicIndex: string;
+  category: string;
+  difficulty: string;
+  isFavorite: boolean;
+}
 
 const RecipesScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Low-Carb', 'High-Protein'];
 
-  const recipes = [
+  const recipes: Recipe[] = [
     // Breakfast Recipes
     {
       id: 1,
@@ -767,6 +786,20 @@ const RecipesScreen = () => {
     }
   };
 
+  const handleRecipePress = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setModalVisible(true);
+  };
+
+  const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
+    // Here you would typically save this to your app's state management or backend
+    Alert.alert(
+      'Added to Meal Plan!',
+      `${recipe.name} has been added to ${day} ${mealType}`,
+      [{ text: 'OK' }]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -823,7 +856,11 @@ const RecipesScreen = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.recipesGrid}>
           {filteredRecipes.map((recipe) => (
-            <TouchableOpacity key={recipe.id} style={styles.recipeCard}>
+            <TouchableOpacity 
+              key={recipe.id} 
+              style={styles.recipeCard}
+              onPress={() => handleRecipePress(recipe)}
+            >
               <View style={styles.recipeImageContainer}>
                 <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
                 <TouchableOpacity style={styles.favoriteButton}>
@@ -884,6 +921,17 @@ const RecipesScreen = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* Recipe Detail Modal */}
+      <RecipeDetailModal
+        visible={modalVisible}
+        recipe={selectedRecipe}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedRecipe(null);
+        }}
+        onAddToMealPlan={handleAddToMealPlan}
+      />
     </SafeAreaView>
   );
 };

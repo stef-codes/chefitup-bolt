@@ -63,7 +63,7 @@ const MealPlanScreen = () => {
 
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const mealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 
   const [mealPlan, setMealPlan] = useState<MealPlan>({
     Monday: {
@@ -109,6 +109,20 @@ const MealPlanScreen = () => {
         difficulty: 'Medium',
         isFavorite: false,
       },
+      Snacks: {
+        id: 100,
+        name: 'Apple with Almond Butter',
+        image: 'https://images.pexels.com/photos/102104/pexels-photo-102104.jpeg',
+        carbs: 25,
+        protein: 6,
+        calories: 180,
+        prepTime: 5,
+        servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: true,
+      },
     },
     Tuesday: {
       Breakfast: {
@@ -152,6 +166,20 @@ const MealPlanScreen = () => {
         category: 'Dinner',
         difficulty: 'Medium',
         isFavorite: true,
+      },
+      Snacks: {
+        id: 101,
+        name: 'Greek Yogurt with Berries',
+        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+        carbs: 18,
+        protein: 15,
+        calories: 150,
+        prepTime: 3,
+        servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: false,
       },
     },
     Wednesday: {
@@ -197,6 +225,20 @@ const MealPlanScreen = () => {
         difficulty: 'Medium',
         isFavorite: true,
       },
+      Snacks: {
+        id: 102,
+        name: 'Carrot Sticks with Hummus',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 20,
+        protein: 8,
+        calories: 160,
+        prepTime: 8,
+        servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: true,
+      },
     },
     Thursday: {
       Breakfast: {
@@ -238,6 +280,20 @@ const MealPlanScreen = () => {
         servings: 3,
         glycemicIndex: 'Low',
         category: 'Dinner',
+        difficulty: 'Easy',
+        isFavorite: false,
+      },
+      Snacks: {
+        id: 103,
+        name: 'Mixed Nuts and Seeds',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 12,
+        protein: 12,
+        calories: 200,
+        prepTime: 2,
+        servings: 1,
+        glycemicIndex: 'Very Low',
+        category: 'Snacks',
         difficulty: 'Easy',
         isFavorite: false,
       },
@@ -285,6 +341,20 @@ const MealPlanScreen = () => {
         difficulty: 'Medium',
         isFavorite: true,
       },
+      Snacks: {
+        id: 104,
+        name: 'Celery with Peanut Butter',
+        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+        carbs: 15,
+        protein: 8,
+        calories: 170,
+        prepTime: 5,
+        servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: false,
+      },
     },
     Saturday: {
       Breakfast: {
@@ -328,6 +398,20 @@ const MealPlanScreen = () => {
         category: 'Dinner',
         difficulty: 'Easy',
         isFavorite: false,
+      },
+      Snacks: {
+        id: 105,
+        name: 'Hard-Boiled Eggs with Avocado',
+        image: 'https://images.pexels.com/photos/566566/pexels-photo-566566.jpeg',
+        carbs: 8,
+        protein: 16,
+        calories: 220,
+        prepTime: 12,
+        servings: 1,
+        glycemicIndex: 'Very Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: true,
       },
     },
     Sunday: {
@@ -373,31 +457,22 @@ const MealPlanScreen = () => {
         difficulty: 'Medium',
         isFavorite: true,
       },
+      Snacks: {
+        id: 106,
+        name: 'Cottage Cheese with Berries',
+        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+        carbs: 22,
+        protein: 18,
+        calories: 190,
+        prepTime: 3,
+        servings: 1,
+        glycemicIndex: 'Low',
+        category: 'Snacks',
+        difficulty: 'Easy',
+        isFavorite: false,
+      },
     },
   });
-
-  const prepSchedule = [
-    {
-      day: 'Sunday',
-      tasks: [
-        'Prep quinoa bowls for Mon-Wed',
-        'Marinate salmon for Mon dinner',
-        'Wash and chop vegetables',
-        'Make chia pudding for Wed',
-      ],
-      duration: '2.5 hours',
-    },
-    {
-      day: 'Wednesday',
-      tasks: [
-        'Prep cauliflower rice stir-fry',
-        'Make almond flour pancake batter',
-        'Prepare snack portions',
-        'Cook lentil soup for Friday',
-      ],
-      duration: '1.5 hours',
-    },
-  ];
 
   const calculateWeeklyStats = () => {
     let totalCarbs = 0;
@@ -777,29 +852,6 @@ const MealPlanScreen = () => {
               ))}
             </View>
           </ScrollView>
-        </View>
-
-        {/* Prep Schedule */}
-        <View style={styles.prepCard}>
-          <Text style={styles.prepTitle}>Prep Schedule</Text>
-          {prepSchedule.map((prep, index) => (
-            <View key={index} style={styles.prepItem}>
-              <View style={styles.prepHeader}>
-                <View style={styles.prepDayContainer}>
-                  <ChefHat size={20} color="#16A34A" />
-                  <Text style={styles.prepDay}>{prep.day}</Text>
-                </View>
-                <Text style={styles.prepDuration}>{prep.duration}</Text>
-              </View>
-              <View style={styles.prepTasks}>
-                {prep.tasks.map((task, taskIndex) => (
-                  <Text key={taskIndex} style={styles.prepTask}>
-                    • {task}
-                  </Text>
-                ))}
-              </View>
-            </View>
-          ))}
         </View>
 
         {/* Action Buttons */}
@@ -1237,56 +1289,6 @@ const styles = StyleSheet.create({
   weekGridEmptyMeal: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  prepCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  prepTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  prepItem: {
-    marginBottom: 16,
-  },
-  prepHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  prepDayContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  prepDay: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#16A34A',
-  },
-  prepDuration: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-  },
-  prepTasks: {
-    gap: 4,
-  },
-  prepTask: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#4B5563',
-    lineHeight: 20,
   },
   actionButtons: {
     gap: 12,

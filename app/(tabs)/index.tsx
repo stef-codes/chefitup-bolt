@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target, Plus, Activity, Droplets } from 'lucide-react-native';
+import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
@@ -153,12 +153,6 @@ const HomeScreen = () => {
     nextMealTime: '6:00 PM',
     bloodSugar: latestBloodSugar,
   };
-
-  const weeklyGoals = [
-    { title: 'Meals Prepped', current: 8, target: 12, icon: ChefHat },
-    { title: 'Carb Goals Met', current: 5, target: 7, icon: Target },
-    { title: 'Recipe Variety', current: 6, target: 8, icon: Heart },
-  ];
 
   const recentRecipes: Recipe[] = [
     {
@@ -322,22 +316,6 @@ const HomeScreen = () => {
           <Text style={styles.carbProgressPercentage}>
             {Math.round((todayStats.carbsConsumed / todayStats.carbsTarget) * 100)}% of daily target
           </Text>
-
-          {/* Recent Carb Entries */}
-          {todaysCarbEntries.length > 0 && (
-            <View style={styles.recentCarbEntries}>
-              <Text style={styles.recentCarbTitle}>Recent Entries</Text>
-              {todaysCarbEntries.slice(-3).map((entry) => (
-                <View key={entry.id} style={styles.carbEntryItem}>
-                  <View style={styles.carbEntryInfo}>
-                    <Text style={styles.carbEntryName}>{entry.name}</Text>
-                    <Text style={styles.carbEntryTime}>{entry.time}</Text>
-                  </View>
-                  <Text style={styles.carbEntryValue}>{entry.carbs}g</Text>
-                </View>
-              ))}
-            </View>
-          )}
         </View>
 
         {/* Blood Sugar Card */}
@@ -412,34 +390,6 @@ const HomeScreen = () => {
               Next meal: {todayStats.nextMeal} at {todayStats.nextMealTime}
             </Text>
           </View>
-        </View>
-
-        {/* Weekly Goals */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Weekly Goals</Text>
-          {weeklyGoals.map((goal, index) => {
-            const IconComponent = goal.icon;
-            const progress = (goal.current / goal.target) * 100;
-            
-            return (
-              <View key={index} style={styles.goalItem}>
-                <View style={styles.goalHeader}>
-                  <View style={styles.goalTitleContainer}>
-                    <IconComponent size={20} color="#16A34A" />
-                    <Text style={styles.goalTitle}>{goal.title}</Text>
-                  </View>
-                  <Text style={styles.goalProgress}>
-                    {goal.current}/{goal.target}
-                  </Text>
-                </View>
-                <View style={styles.progressBar}>
-                  <View 
-                    style={[styles.progressBarFill, { width: `${progress}%` }]} 
-                  />
-                </View>
-              </View>
-            );
-          })}
         </View>
 
         {/* Quick Actions */}
@@ -549,7 +499,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   header: {
-    marginTop: 8,
+    marginTop: 24,
     marginBottom: 24,
   },
   greeting: {
@@ -635,42 +585,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
     textAlign: 'center',
-  },
-  recentCarbEntries: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  recentCarbTitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  carbEntryItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 6,
-  },
-  carbEntryInfo: {
-    flex: 1,
-  },
-  carbEntryName: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#111827',
-  },
-  carbEntryTime: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-  },
-  carbEntryValue: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#16A34A',
   },
   bloodSugarCard: {
     backgroundColor: '#ffffff',
@@ -827,40 +741,11 @@ const styles = StyleSheet.create({
     color: '#16A34A',
     marginLeft: 8,
   },
-  goalItem: {
-    marginBottom: 16,
-  },
-  goalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  goalTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  goalTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-Medium',
-    color: '#111827',
-    marginLeft: 8,
-  },
-  goalProgress: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#16A34A',
-  },
   progressBar: {
     height: 6,
     backgroundColor: '#E5E7EB',
     borderRadius: 3,
     overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#16A34A',
-    borderRadius: 3,
   },
   quickActions: {
     flexDirection: 'row',

@@ -8,7 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Target, TrendingUp, Bell, CircleHelp as HelpCircle, LogOut, ChevronRight, Award, Calendar } from 'lucide-react-native';
+import { User, Settings, Heart, Target, TrendingUp, Bell, LogOut, ChevronRight, Award, Calendar } from 'lucide-react-native';
 
 const ProfileScreen = () => {
   const userProfile = {
@@ -35,11 +35,10 @@ const ProfileScreen = () => {
   ];
 
   const menuItems = [
-    { icon: Settings, title: 'Settings', subtitle: 'App preferences and notifications', action: () => {} },
-    { icon: Heart, title: 'Health Profile', subtitle: 'Update diabetes and dietary info', action: () => {} },
-    { icon: TrendingUp, title: 'Progress Report', subtitle: 'View detailed analytics', action: () => {} },
-    { icon: Bell, title: 'Reminders', subtitle: 'Meal prep and eating reminders', action: () => {} },
-    { icon: HelpCircle, title: 'Help & Support', subtitle: 'FAQs and contact support', action: () => {} },
+    { icon: Settings, title: 'Settings', action: () => {} },
+    { icon: Heart, title: 'Health Profile', action: () => {} },
+    { icon: TrendingUp, title: 'Progress Report', action: () => {} },
+    { icon: Bell, title: 'Notifications', action: () => {} },
   ];
 
   return (
@@ -116,7 +115,7 @@ const ProfileScreen = () => {
           </View>
         </View>
 
-        {/* Menu Items */}
+        {/* Simplified Menu Items */}
         <View style={styles.menuCard}>
           {menuItems.map((item, index) => {
             const IconComponent = item.icon;
@@ -126,10 +125,7 @@ const ProfileScreen = () => {
                   <View style={styles.menuIcon}>
                     <IconComponent size={20} color="#16A34A" />
                   </View>
-                  <View style={styles.menuText}>
-                    <Text style={styles.menuTitle}>{item.title}</Text>
-                    <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-                  </View>
+                  <Text style={styles.menuTitle}>{item.title}</Text>
                 </View>
                 <ChevronRight size={20} color="#9CA3AF" />
               </TouchableOpacity>
@@ -366,19 +362,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  menuText: {
-    flex: 1,
-  },
   menuTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
-    marginBottom: 2,
-  },
-  menuSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
   },
   signOutButton: {
     flexDirection: 'row',

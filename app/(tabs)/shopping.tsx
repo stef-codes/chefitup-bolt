@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Plus, Trash2, ShoppingCart, DollarSign, RefreshCw, Calendar } from 'lucide-react-native';
+import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar } from 'lucide-react-native';
 
 const ShoppingScreen = () => {
   const [newItem, setNewItem] = useState('');
@@ -55,121 +55,121 @@ const ShoppingScreen = () => {
     },
   };
 
-  // Ingredient categories and estimated prices
+  // Ingredient categories
   const ingredientDatabase = {
     // Proteins
-    'Greek yogurt (32 oz)': { category: 'Dairy', price: 5.49 },
-    'Salmon fillets (1.5 lbs)': { category: 'Protein', price: 18.99 },
-    'Chicken breast (1.5 lbs)': { category: 'Protein', price: 12.99 },
-    'Chicken thighs (2 lbs)': { category: 'Protein', price: 8.99 },
-    'Ground turkey (1 lb)': { category: 'Protein', price: 6.99 },
-    'Ground turkey (1.5 lbs)': { category: 'Protein', price: 9.99 },
-    'Cod fillets (1.5 lbs)': { category: 'Protein', price: 16.99 },
-    'Sliced turkey (1 lb)': { category: 'Protein', price: 7.99 },
-    'Pork tenderloin (2 lbs)': { category: 'Protein', price: 14.99 },
-    'Eggs (1 dozen)': { category: 'Protein', price: 3.99 },
+    'Greek yogurt (32 oz)': { category: 'Dairy' },
+    'Salmon fillets (1.5 lbs)': { category: 'Protein' },
+    'Chicken breast (1.5 lbs)': { category: 'Protein' },
+    'Chicken thighs (2 lbs)': { category: 'Protein' },
+    'Ground turkey (1 lb)': { category: 'Protein' },
+    'Ground turkey (1.5 lbs)': { category: 'Protein' },
+    'Cod fillets (1.5 lbs)': { category: 'Protein' },
+    'Sliced turkey (1 lb)': { category: 'Protein' },
+    'Pork tenderloin (2 lbs)': { category: 'Protein' },
+    'Eggs (1 dozen)': { category: 'Protein' },
     
     // Vegetables
-    'Mixed berries (2 cups)': { category: 'Produce', price: 6.99 },
-    'Cucumber (2 large)': { category: 'Produce', price: 2.99 },
-    'Cucumber (1 large)': { category: 'Produce', price: 1.99 },
-    'Cherry tomatoes (1 lb)': { category: 'Produce', price: 4.99 },
-    'Cherry tomatoes (1 pint)': { category: 'Produce', price: 3.99 },
-    'Bell peppers (3 mixed)': { category: 'Produce', price: 4.99 },
-    'Bell pepper (1 medium)': { category: 'Produce', price: 1.99 },
-    'Bell peppers (6 large)': { category: 'Produce', price: 8.99 },
-    'Broccoli (2 heads)': { category: 'Produce', price: 4.99 },
-    'Cauliflower (2 heads)': { category: 'Produce', price: 6.99 },
-    'Spinach (5 oz bag)': { category: 'Produce', price: 3.49 },
-    'Romaine lettuce (3 heads)': { category: 'Produce', price: 4.99 },
-    'Lettuce (1 head)': { category: 'Produce', price: 2.49 },
-    'Avocados (4 large)': { category: 'Produce', price: 5.99 },
-    'Sweet potato (3 large)': { category: 'Produce', price: 3.99 },
-    'Sweet potato (2 large)': { category: 'Produce', price: 2.99 },
-    'Carrots (1 lb)': { category: 'Produce', price: 1.99 },
-    'Onion (1 large)': { category: 'Produce', price: 1.49 },
-    'Onion (1 medium)': { category: 'Produce', price: 0.99 },
-    'Onion (1 small)': { category: 'Produce', price: 0.79 },
-    'Red onion (1 medium)': { category: 'Produce', price: 1.29 },
-    'Red onion (1 large)': { category: 'Produce', price: 1.79 },
-    'Red onion (1 small)': { category: 'Produce', price: 0.99 },
-    'Garlic (1 bulb)': { category: 'Produce', price: 0.99 },
-    'Ginger (1 piece)': { category: 'Produce', price: 1.99 },
-    'Asparagus (1 lb)': { category: 'Produce', price: 4.99 },
-    'Snap peas (1 lb)': { category: 'Produce', price: 4.49 },
-    'Mushrooms (8 oz)': { category: 'Produce', price: 2.99 },
-    'Zucchini (4 large)': { category: 'Produce', price: 3.99 },
-    'Brussels sprouts (1 lb)': { category: 'Produce', price: 4.99 },
-    'Celery (1 bunch)': { category: 'Produce', price: 2.49 },
-    'Banana (6 pieces)': { category: 'Produce', price: 2.99 },
-    'Fresh berries (2 cups)': { category: 'Produce', price: 6.99 },
-    'Red cabbage (1 head)': { category: 'Produce', price: 2.99 },
-    'Green beans (1 lb)': { category: 'Produce', price: 3.99 },
-    'Baby potatoes (2 lbs)': { category: 'Produce', price: 4.99 },
-    'Tomato (2 medium)': { category: 'Produce', price: 2.99 },
-    'Lemons (3 pieces)': { category: 'Produce', price: 2.49 },
-    'Lemon (2 pieces)': { category: 'Produce', price: 1.99 },
-    'Lemon (3 pieces)': { category: 'Produce', price: 2.49 },
-    'Lime (3 pieces)': { category: 'Produce', price: 1.99 },
+    'Mixed berries (2 cups)': { category: 'Produce' },
+    'Cucumber (2 large)': { category: 'Produce' },
+    'Cucumber (1 large)': { category: 'Produce' },
+    'Cherry tomatoes (1 lb)': { category: 'Produce' },
+    'Cherry tomatoes (1 pint)': { category: 'Produce' },
+    'Bell peppers (3 mixed)': { category: 'Produce' },
+    'Bell pepper (1 medium)': { category: 'Produce' },
+    'Bell peppers (6 large)': { category: 'Produce' },
+    'Broccoli (2 heads)': { category: 'Produce' },
+    'Cauliflower (2 heads)': { category: 'Produce' },
+    'Spinach (5 oz bag)': { category: 'Produce' },
+    'Romaine lettuce (3 heads)': { category: 'Produce' },
+    'Lettuce (1 head)': { category: 'Produce' },
+    'Avocados (4 large)': { category: 'Produce' },
+    'Sweet potato (3 large)': { category: 'Produce' },
+    'Sweet potato (2 large)': { category: 'Produce' },
+    'Carrots (1 lb)': { category: 'Produce' },
+    'Onion (1 large)': { category: 'Produce' },
+    'Onion (1 medium)': { category: 'Produce' },
+    'Onion (1 small)': { category: 'Produce' },
+    'Red onion (1 medium)': { category: 'Produce' },
+    'Red onion (1 large)': { category: 'Produce' },
+    'Red onion (1 small)': { category: 'Produce' },
+    'Garlic (1 bulb)': { category: 'Produce' },
+    'Ginger (1 piece)': { category: 'Produce' },
+    'Asparagus (1 lb)': { category: 'Produce' },
+    'Snap peas (1 lb)': { category: 'Produce' },
+    'Mushrooms (8 oz)': { category: 'Produce' },
+    'Zucchini (4 large)': { category: 'Produce' },
+    'Brussels sprouts (1 lb)': { category: 'Produce' },
+    'Celery (1 bunch)': { category: 'Produce' },
+    'Banana (6 pieces)': { category: 'Produce' },
+    'Fresh berries (2 cups)': { category: 'Produce' },
+    'Red cabbage (1 head)': { category: 'Produce' },
+    'Green beans (1 lb)': { category: 'Produce' },
+    'Baby potatoes (2 lbs)': { category: 'Produce' },
+    'Tomato (2 medium)': { category: 'Produce' },
+    'Lemons (3 pieces)': { category: 'Produce' },
+    'Lemon (2 pieces)': { category: 'Produce' },
+    'Lemon (3 pieces)': { category: 'Produce' },
+    'Lime (3 pieces)': { category: 'Produce' },
     
     // Grains & Pantry
-    'Quinoa (2 cups)': { category: 'Grains', price: 6.99 },
-    'Brown rice (2 cups)': { category: 'Grains', price: 3.99 },
-    'Steel cut oats (2 lbs)': { category: 'Grains', price: 5.99 },
-    'Almond flour (2 lbs)': { category: 'Baking', price: 12.99 },
-    'Whole grain bread (1 loaf)': { category: 'Bakery', price: 3.99 },
-    'Whole wheat tortillas (1 pack)': { category: 'Bakery', price: 4.49 },
-    'Granola (1 cup)': { category: 'Pantry', price: 5.99 },
+    'Quinoa (2 cups)': { category: 'Grains' },
+    'Brown rice (2 cups)': { category: 'Grains' },
+    'Steel cut oats (2 lbs)': { category: 'Grains' },
+    'Almond flour (2 lbs)': { category: 'Baking' },
+    'Whole grain bread (1 loaf)': { category: 'Bakery' },
+    'Whole wheat tortillas (1 pack)': { category: 'Bakery' },
+    'Granola (1 cup)': { category: 'Pantry' },
     
     // Dairy
-    'Feta cheese (8 oz)': { category: 'Dairy', price: 4.99 },
-    'Parmesan cheese (8 oz)': { category: 'Dairy', price: 6.99 },
-    'Mozzarella cheese (8 oz)': { category: 'Dairy', price: 4.49 },
-    'Cheese (shredded, 8 oz)': { category: 'Dairy', price: 4.99 },
-    'Almond milk (32 oz)': { category: 'Dairy', price: 3.99 },
-    'Coconut milk (2 cans)': { category: 'Pantry', price: 3.99 },
+    'Feta cheese (8 oz)': { category: 'Dairy' },
+    'Parmesan cheese (8 oz)': { category: 'Dairy' },
+    'Mozzarella cheese (8 oz)': { category: 'Dairy' },
+    'Cheese (shredded, 8 oz)': { category: 'Dairy' },
+    'Almond milk (32 oz)': { category: 'Dairy' },
+    'Coconut milk (2 cans)': { category: 'Pantry' },
     
     // Pantry Items
-    'Olive oil (1 bottle)': { category: 'Pantry', price: 8.99 },
-    'Sesame oil (1 bottle)': { category: 'Pantry', price: 6.99 },
-    'Soy sauce (1 bottle)': { category: 'Pantry', price: 3.99 },
-    'Honey (1 bottle)': { category: 'Pantry', price: 4.99 },
-    'Maple syrup (1 bottle)': { category: 'Pantry', price: 7.99 },
-    'Sugar-free syrup (1 bottle)': { category: 'Pantry', price: 5.99 },
-    'Vanilla extract (1 bottle)': { category: 'Baking', price: 6.99 },
-    'Baking powder (1 container)': { category: 'Baking', price: 2.99 },
-    'Kalamata olives (1 jar)': { category: 'Pantry', price: 4.99 },
-    'Hummus (2 containers)': { category: 'Pantry', price: 6.99 },
-    'Tahini (1 jar)': { category: 'Pantry', price: 8.99 },
-    'Mayo (1 jar)': { category: 'Pantry', price: 4.49 },
-    'Dijon mustard (1 jar)': { category: 'Pantry', price: 3.99 },
-    'Caesar dressing (1 bottle)': { category: 'Pantry', price: 3.99 },
-    'Marinara sauce (24 oz jar)': { category: 'Pantry', price: 3.99 },
-    'Crushed tomatoes (28 oz can)': { category: 'Pantry', price: 2.99 },
-    'Diced tomatoes (14 oz can)': { category: 'Pantry', price: 1.99 },
-    'Vegetable broth (64 oz)': { category: 'Pantry', price: 3.99 },
-    'Chickpeas (2 cans)': { category: 'Pantry', price: 2.99 },
-    'Green lentils (2 lbs)': { category: 'Pantry', price: 4.99 },
-    'Chia seeds (1 lb)': { category: 'Nuts & Seeds', price: 9.99 },
-    'Almond butter (1 jar)': { category: 'Nuts & Seeds', price: 8.99 },
-    'Walnuts (1 lb)': { category: 'Nuts & Seeds', price: 12.99 },
-    'Coconut flakes (1 bag)': { category: 'Baking', price: 4.99 },
-    'Protein powder (1 container)': { category: 'Supplements', price: 29.99 },
-    'Frozen berries (2 lbs)': { category: 'Frozen', price: 8.99 },
-    'Breadcrumbs (1 container)': { category: 'Pantry', price: 2.99 },
-    'Whole grain croutons (1 bag)': { category: 'Pantry', price: 3.99 },
-    'Unsweetened cocoa powder (1 container)': { category: 'Baking', price: 4.99 },
-    'Cinnamon (1 container)': { category: 'Spices', price: 2.99 },
-    'Italian seasoning (1 container)': { category: 'Spices', price: 2.99 },
-    'Italian herbs (dried)': { category: 'Spices', price: 3.99 },
-    'Bay leaves (1 package)': { category: 'Spices', price: 2.49 },
-    'Everything bagel seasoning (1 container)': { category: 'Spices', price: 3.99 },
-    'Fresh herbs (dill, parsley)': { category: 'Produce', price: 4.99 },
-    'Fresh parsley (1 bunch)': { category: 'Produce', price: 1.99 },
-    'Fresh herbs (rosemary, thyme)': { category: 'Produce', price: 4.99 },
-    'Rosemary (fresh, 1 package)': { category: 'Produce', price: 2.99 },
-    'Thyme (fresh, 1 package)': { category: 'Produce', price: 2.99 },
-    'Fresh thyme (1 package)': { category: 'Produce', price: 2.99 },
+    'Olive oil (1 bottle)': { category: 'Pantry' },
+    'Sesame oil (1 bottle)': { category: 'Pantry' },
+    'Soy sauce (1 bottle)': { category: 'Pantry' },
+    'Honey (1 bottle)': { category: 'Pantry' },
+    'Maple syrup (1 bottle)': { category: 'Pantry' },
+    'Sugar-free syrup (1 bottle)': { category: 'Pantry' },
+    'Vanilla extract (1 bottle)': { category: 'Baking' },
+    'Baking powder (1 container)': { category: 'Baking' },
+    'Kalamata olives (1 jar)': { category: 'Pantry' },
+    'Hummus (2 containers)': { category: 'Pantry' },
+    'Tahini (1 jar)': { category: 'Pantry' },
+    'Mayo (1 jar)': { category: 'Pantry' },
+    'Dijon mustard (1 jar)': { category: 'Pantry' },
+    'Caesar dressing (1 bottle)': { category: 'Pantry' },
+    'Marinara sauce (24 oz jar)': { category: 'Pantry' },
+    'Crushed tomatoes (28 oz can)': { category: 'Pantry' },
+    'Diced tomatoes (14 oz can)': { category: 'Pantry' },
+    'Vegetable broth (64 oz)': { category: 'Pantry' },
+    'Chickpeas (2 cans)': { category: 'Pantry' },
+    'Green lentils (2 lbs)': { category: 'Pantry' },
+    'Chia seeds (1 lb)': { category: 'Nuts & Seeds' },
+    'Almond butter (1 jar)': { category: 'Nuts & Seeds' },
+    'Walnuts (1 lb)': { category: 'Nuts & Seeds' },
+    'Coconut flakes (1 bag)': { category: 'Baking' },
+    'Protein powder (1 container)': { category: 'Supplements' },
+    'Frozen berries (2 lbs)': { category: 'Frozen' },
+    'Breadcrumbs (1 container)': { category: 'Pantry' },
+    'Whole grain croutons (1 bag)': { category: 'Pantry' },
+    'Unsweetened cocoa powder (1 container)': { category: 'Baking' },
+    'Cinnamon (1 container)': { category: 'Spices' },
+    'Italian seasoning (1 container)': { category: 'Spices' },
+    'Italian herbs (dried)': { category: 'Spices' },
+    'Bay leaves (1 package)': { category: 'Spices' },
+    'Everything bagel seasoning (1 container)': { category: 'Spices' },
+    'Fresh herbs (dill, parsley)': { category: 'Produce' },
+    'Fresh parsley (1 bunch)': { category: 'Produce' },
+    'Fresh herbs (rosemary, thyme)': { category: 'Produce' },
+    'Rosemary (fresh, 1 package)': { category: 'Produce' },
+    'Thyme (fresh, 1 package)': { category: 'Produce' },
+    'Fresh thyme (1 package)': { category: 'Produce' },
   };
 
   const categories = ['Produce', 'Protein', 'Dairy', 'Grains', 'Pantry', 'Nuts & Seeds', 'Spices', 'Baking', 'Frozen', 'Supplements', 'Bakery'];
@@ -201,7 +201,6 @@ const ShoppingScreen = () => {
           name: ingredient,
           category: dbItem?.category || 'Other',
           quantity: '1',
-          price: dbItem?.price || 0,
           checked: false,
           fromMealPlan: true,
         };
@@ -221,9 +220,9 @@ const ShoppingScreen = () => {
   // Initialize with some basic items
   useEffect(() => {
     const basicItems = [
-      { id: 1, name: 'Greek yogurt (32 oz)', category: 'Dairy', quantity: '1', price: 5.49, checked: false, fromMealPlan: false },
-      { id: 2, name: 'Olive oil (1 bottle)', category: 'Pantry', quantity: '1', price: 8.99, checked: true, fromMealPlan: false },
-      { id: 3, name: 'Eggs (1 dozen)', category: 'Protein', quantity: '1', price: 3.99, checked: false, fromMealPlan: false },
+      { id: 1, name: 'Greek yogurt (32 oz)', category: 'Dairy', quantity: '1', checked: false, fromMealPlan: false },
+      { id: 2, name: 'Olive oil (1 bottle)', category: 'Pantry', quantity: '1', checked: true, fromMealPlan: false },
+      { id: 3, name: 'Eggs (1 dozen)', category: 'Protein', quantity: '1', checked: false, fromMealPlan: false },
     ];
     
     if (shoppingList.length === 0) {
@@ -250,7 +249,6 @@ const ShoppingScreen = () => {
         name: newItem.trim(),
         category: 'Other',
         quantity: '1',
-        price: 0,
         checked: false,
         fromMealPlan: false,
       };
@@ -272,16 +270,6 @@ const ShoppingScreen = () => {
 
   const getItemsByCategory = (category: string) => {
     return shoppingList.filter(item => item.category === category);
-  };
-
-  const getTotalPrice = () => {
-    return shoppingList.reduce((total, item) => total + item.price, 0);
-  };
-
-  const getCheckedPrice = () => {
-    return shoppingList
-      .filter(item => item.checked)
-      .reduce((total, item) => total + item.price, 0);
   };
 
   const getCheckedCount = () => {
@@ -312,22 +300,10 @@ const ShoppingScreen = () => {
               <ShoppingCart size={20} color="#16A34A" />
               <View style={styles.summaryText}>
                 <Text style={styles.summaryValue}>
-                  {getCheckedCount()}/{shoppingList.length}
-                </Text>
-                <Text style={styles.summaryLabel}>Items</Text>
-              </View>
-            </View>
-            
-            <View style={styles.summaryDivider} />
-            
-            <View style={styles.summaryItem}>
-              <DollarSign size={20} color="#10B981" />
-              <View style={styles.summaryText}>
-                <Text style={styles.summaryValue}>
-                  ${getCheckedPrice().toFixed(2)}
+                  {getCheckedCount()}
                 </Text>
                 <Text style={styles.summaryLabel}>
-                  of ${getTotalPrice().toFixed(2)}
+                  of {shoppingList.length} items
                 </Text>
               </View>
             </View>
@@ -453,17 +429,9 @@ const ShoppingScreen = () => {
                           ]}>
                             {item.name}
                           </Text>
-                          {item.fromMealPlan && (
-                            <View style={styles.mealPlanBadge}>
-                              <Text style={styles.mealPlanBadgeText}>MP</Text>
-                            </View>
-                          )}
                         </View>
                         <View style={styles.itemMeta}>
                           <Text style={styles.itemQuantity}>{item.quantity}</Text>
-                          {item.price > 0 && (
-                            <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
-                          )}
                         </View>
                       </View>
                       
@@ -560,12 +528,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
-  },
-  summaryDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#E5E7EB',
-    marginHorizontal: 20,
   },
   progressContainer: {
     gap: 8,
@@ -770,18 +732,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     color: '#9CA3AF',
   },
-  mealPlanBadge: {
-    backgroundColor: '#DCFCE7',
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 8,
-  },
-  mealPlanBadgeText: {
-    fontSize: 10,
-    fontFamily: 'Inter-Bold',
-    color: '#16A34A',
-  },
   itemMeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -791,11 +741,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#10B981',
   },
   deleteButton: {
     padding: 8,

@@ -9,7 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle, CreditCard as Edit3 } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle } from 'lucide-react-native';
+import { router } from 'expo-router';
 import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
 
 interface Recipe {
@@ -577,24 +578,23 @@ const MealPlanScreen = () => {
   };
 
   const generateRandomMealPlan = () => {
+    // This would typically call an API to generate a new meal plan
     Alert.alert(
       'Generate New Meal Plan',
-      'This will replace your current meal plan with new recipe suggestions. Continue?',
+      'This will create a new diabetes-friendly meal plan for the week.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Generate', 
-          onPress: () => {
-            // In a real app, this would call an API to generate a new meal plan
-            Alert.alert(
-              'Meal Plan Generated!',
-              'Your new meal plan has been created with fresh recipe suggestions.',
-              [{ text: 'OK' }]
-            );
-          }
-        },
+        { text: 'Generate', onPress: () => {
+          // Simulate API call
+          Alert.alert('Success', 'New meal plan generated!');
+        }},
       ]
     );
+  };
+
+  const handleGenerateShoppingList = () => {
+    // Navigate to the shopping list tab
+    router.push('/(tabs)/shopping');
   };
 
   const currentDayName = weekDays[selectedDay];
@@ -718,10 +718,6 @@ const MealPlanScreen = () => {
                 <Text style={styles.todayMealsLabel}> (Today)</Text>
               )}
             </Text>
-            <TouchableOpacity style={styles.customizeAllButton}>
-              <Edit3 size={16} color="#16A34A" />
-              <Text style={styles.customizeAllText}>Customize</Text>
-            </TouchableOpacity>
           </View>
           
           {mealTypes.map((mealType) => {
@@ -856,7 +852,7 @@ const MealPlanScreen = () => {
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleGenerateShoppingList}>
             <Calendar size={20} color="#ffffff" />
             <Text style={styles.primaryButtonText}>Generate Shopping List</Text>
           </TouchableOpacity>
@@ -1059,29 +1055,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   dailyMealsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 20,
   },
   dailyMealsTitle: {
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
-  },
-  customizeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#DCFCE7',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  customizeAllText: {
-    fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
-    color: '#16A34A',
   },
   todayMealsLabel: {
     fontSize: 16,

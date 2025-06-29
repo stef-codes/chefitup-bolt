@@ -6,14 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Settings, Heart, Target, TrendingUp, Bell, LogOut, ChevronRight, Award, Calendar } from 'lucide-react-native';
+import { useAuth } from '../../contexts/AuthContext';
+import { router } from 'expo-router';
 
 const ProfileScreen = () => {
+  const { user, signOut } = useAuth();
+
   const userProfile = {
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
+    name: user?.user_metadata?.full_name || 'User',
+    email: user?.email || '',
     diabetesType: 'Type 2',
     carbBudget: 150,
     joinDate: 'March 2024',
@@ -40,6 +45,28 @@ const ProfileScreen = () => {
     { icon: TrendingUp, title: 'Progress Report', action: () => {} },
     { icon: Bell, title: 'Notifications', action: () => {} },
   ];
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            const { error } = await signOut();
+            if (error) {
+              Alert.alert('Error', 'Failed to sign out');
+            } else {
+              router.replace('/auth');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,7 +161,7 @@ const ProfileScreen = () => {
         </View>
 
         {/* Sign Out */}
-        <TouchableOpacity style={styles.signOutButton}>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
           <LogOut size={20} color="#EF4444" />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>

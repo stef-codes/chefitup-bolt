@@ -11,9 +11,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar } from 'lucide-react-native';
 
+type ShoppingListItem = {
+  id: number;
+  name: string;
+  category: string;
+  quantity: string;
+  checked: boolean;
+  fromMealPlan: boolean;
+};
+
 const ShoppingScreen = () => {
   const [newItem, setNewItem] = useState('');
-  const [shoppingList, setShoppingList] = useState([]);
+  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Meal plan data (in a real app, this would come from a shared state/context)
@@ -180,7 +189,7 @@ const ShoppingScreen = () => {
     
     // Simulate API call delay
     setTimeout(() => {
-      const allIngredients = [];
+      const allIngredients: string[] = [];
       
       // Extract all ingredients from the week's meal plan
       Object.values(currentWeekMealPlan).forEach(day => {
@@ -194,8 +203,8 @@ const ShoppingScreen = () => {
       // Remove duplicates and create shopping list items
       const uniqueIngredients = [...new Set(allIngredients)];
       
-      const newShoppingList = uniqueIngredients.map((ingredient, index) => {
-        const dbItem = ingredientDatabase[ingredient];
+      const newShoppingList: ShoppingListItem[] = uniqueIngredients.map((ingredient, index) => {
+        const dbItem = ingredientDatabase[ingredient as keyof typeof ingredientDatabase];
         return {
           id: Date.now() + index,
           name: ingredient,

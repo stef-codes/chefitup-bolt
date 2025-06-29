@@ -292,7 +292,7 @@ const CarbCounterModal: React.FC<CarbCounterModalProps> = ({
                     <Text style={styles.impactTitle}>Carb Impact</Text>
                   </View>
                   <Text style={styles.impactValue}>
-                    +{parseFloat(carbAmount)}g carbs
+                    <Text>+{parseFloat(carbAmount)}g carbs</Text>
                   </Text>
                   <Text style={styles.impactDescription}>
                     This will be added to your daily carb total

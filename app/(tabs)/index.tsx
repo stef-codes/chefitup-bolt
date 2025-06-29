@@ -6,12 +6,31 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target } from 'lucide-react-native';
+import RecipeDetailModal from '../../components/RecipeDetailModal';
+
+interface Recipe {
+  id: number;
+  name: string;
+  image: string;
+  carbs: number;
+  protein: number;
+  calories: number;
+  prepTime: number;
+  servings: number;
+  glycemicIndex: string;
+  category: string;
+  difficulty: string;
+  isFavorite: boolean;
+}
 
 const HomeScreen = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Update current time every minute
   useEffect(() => {
@@ -51,30 +70,62 @@ const HomeScreen = () => {
     { title: 'Recipe Variety', current: 6, target: 8, icon: Heart },
   ];
 
-  const recentRecipes = [
+  const recentRecipes: Recipe[] = [
     {
       id: 1,
       name: 'Mediterranean Quinoa Bowl',
       carbs: 35,
+      protein: 18,
+      calories: 420,
       glycemicIndex: 'Low',
       prepTime: 25,
+      servings: 2,
       image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+      category: 'Lunch',
+      difficulty: 'Easy',
+      isFavorite: true,
     },
     {
       id: 2,
       name: 'Herb-Crusted Salmon',
       carbs: 12,
+      protein: 32,
+      calories: 380,
       glycemicIndex: 'Very Low',
       prepTime: 30,
+      servings: 4,
       image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg',
+      category: 'Dinner',
+      difficulty: 'Medium',
+      isFavorite: false,
     },
     {
       id: 3,
       name: 'Cauliflower Rice Stir-Fry',
       carbs: 18,
+      protein: 14,
+      calories: 280,
       glycemicIndex: 'Low',
       prepTime: 20,
+      servings: 3,
       image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+      category: 'Dinner',
+      difficulty: 'Easy',
+      isFavorite: true,
+    },
+    {
+      id: 4,
+      name: 'Greek Yogurt Parfait',
+      carbs: 28,
+      protein: 20,
+      calories: 320,
+      glycemicIndex: 'Medium',
+      prepTime: 10,
+      servings: 1,
+      image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
+      category: 'Breakfast',
+      difficulty: 'Easy',
+      isFavorite: false,
     },
   ];
 
@@ -91,6 +142,20 @@ const HomeScreen = () => {
       default:
         return '#6B7280';
     }
+  };
+
+  const handleRecipePress = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setModalVisible(true);
+  };
+
+  const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
+    // Here you would typically save this to your app's state management or backend
+    Alert.alert(
+      'Added to Meal Plan!',
+      `${recipe.name} has been added to ${day} ${mealType}`,
+      [{ text: 'OK' }]
+    );
   };
 
   return (
@@ -181,7 +246,12 @@ const HomeScreen = () => {
           
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {recentRecipes.map((recipe) => (
-              <TouchableOpacity key={recipe.id} style={styles.recipeCard}>
+              <TouchableOpacity 
+                key={recipe.id} 
+                style={styles.recipeCard}
+                onPress={() => handleRecipePress(recipe)}
+                activeOpacity={0.7}
+              >
                 <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
                 <View style={styles.recipeInfo}>
                   <Text style={styles.recipeName}>{recipe.name}</Text>
@@ -208,6 +278,17 @@ const HomeScreen = () => {
           </ScrollView>
         </View>
       </ScrollView>
+
+      {/* Recipe Detail Modal */}
+      <RecipeDetailModal
+        visible={modalVisible}
+        recipe={selectedRecipe}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedRecipe(null);
+        }}
+        onAddToMealPlan={handleAddToMealPlan}
+      />
     </SafeAreaView>
   );
 };
@@ -366,6 +447,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
     borderRadius: 12,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   recipeImage: {
     width: '100%',

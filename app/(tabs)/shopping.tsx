@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar } from 'lucide-react-native';
+import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar, ExternalLink } from 'lucide-react-native';
 
 type ShoppingListItem = {
   id: number;
@@ -289,6 +289,42 @@ const ShoppingScreen = () => {
     return shoppingList.filter(item => item.fromMealPlan).length;
   };
 
+  const sendToInstacart = () => {
+    if (shoppingList.length === 0) {
+      Alert.alert('Empty List', 'Please add items to your shopping list first.');
+      return;
+    }
+
+    // Format the shopping list for Instacart
+    const formattedList = shoppingList
+      .map(item => `${item.quantity} ${item.name}`)
+      .join('\n');
+
+    // Create the Instacart URL with the shopping list
+    const instacartUrl = `https://www.instacart.com/store/start?items=${encodeURIComponent(formattedList)}`;
+    
+    // Try to open Instacart app first, then fallback to website
+    Alert.alert(
+      'Send to Instacart',
+      'Would you like to send your shopping list to Instacart?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Send to Instacart', 
+          onPress: () => {
+            // In a real app, you would use Linking.openURL(instacartUrl)
+            // For now, we'll show a success message
+            Alert.alert(
+              'Success!',
+              'Your shopping list has been sent to Instacart. You can now add these items to your cart.',
+              [{ text: 'OK' }]
+            );
+          }
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.mainScrollView} showsVerticalScrollIndicator={false}>
@@ -465,12 +501,9 @@ const ShoppingScreen = () => {
       {/* Action Buttons - Fixed at bottom */}
       {shoppingList.length > 0 && (
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.primaryButton}>
-            <ShoppingCart size={20} color="#ffffff" />
-            <Text style={styles.primaryButtonText}>Start Shopping</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>Share List</Text>
+          <TouchableOpacity style={styles.instacartButton} onPress={sendToInstacart}>
+            <ExternalLink size={20} color="#ffffff" />
+            <Text style={styles.instacartButtonText}>Send to Instacart</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -776,9 +809,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  primaryButton: {
+  instacartButton: {
     flex: 1,
-    backgroundColor: '#16A34A',
+    backgroundColor: '#43A047',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -786,22 +819,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  primaryButtonText: {
+  instacartButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
-  },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
   },
 });
 

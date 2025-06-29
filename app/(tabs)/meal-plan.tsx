@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,25 @@ import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat } from
 
 const MealPlanScreen = () => {
   const [selectedWeek, setSelectedWeek] = useState(0);
-  const [selectedDay, setSelectedDay] = useState(0); // For mobile day navigation
+  const [selectedDay, setSelectedDay] = useState(0);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Update current date every minute to keep it accurate
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDate(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Initialize selected day to today when component mounts
+  useEffect(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const mondayBasedIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to Monday-based index
+    setSelectedDay(mondayBasedIndex);
+  }, []);
 
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -244,21 +262,52 @@ const MealPlanScreen = () => {
     }
   };
 
-  const formatDate = (dayOffset: number) => {
-    const today = new Date();
-    const date = new Date(today);
-    date.setDate(today.getDate() + dayOffset + (selectedWeek * 7));
-    return date.getDate();
+  // Get the date for a specific day in the selected week
+  const getDateForDay = (dayIndex: number) => {
+    const today = new Date(currentDate);
+    const currentDayOfWeek = today.getDay();
+    const mondayBasedToday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+    
+    // Calculate days from today to the target day
+    const daysFromToday = (selectedWeek * 7) + (dayIndex - mondayBasedToday);
+    
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + daysFromToday);
+    
+    return targetDate;
   };
 
+  // Check if a specific day is today
   const isToday = (dayIndex: number) => {
-    const today = new Date().getDay();
-    const mondayBasedIndex = today === 0 ? 6 : today - 1;
-    return dayIndex === mondayBasedIndex && selectedWeek === 0;
+    if (selectedWeek !== 0) return false;
+    
+    const today = new Date(currentDate);
+    const currentDayOfWeek = today.getDay();
+    const mondayBasedToday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+    
+    return dayIndex === mondayBasedToday;
+  };
+
+  // Get week title based on selected week
+  const getWeekTitle = () => {
+    if (selectedWeek === 0) return 'This Week';
+    if (selectedWeek === 1) return 'Next Week';
+    if (selectedWeek === -1) return 'Last Week';
+    return selectedWeek > 0 ? `${selectedWeek + 1} Weeks Ahead` : `${Math.abs(selectedWeek)} Weeks Ago`;
+  };
+
+  // Format date for display
+  const formatDateForDisplay = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: date.getFullYear() !== currentDate.getFullYear() ? 'numeric' : undefined
+    });
   };
 
   const currentDayName = weekDays[selectedDay];
   const currentDayMeals = mealPlan[currentDayName];
+  const selectedDayDate = getDateForDay(selectedDay);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -279,9 +328,7 @@ const MealPlanScreen = () => {
           </TouchableOpacity>
           
           <Text style={styles.weekTitle}>
-            {selectedWeek === 0 ? 'This Week' : 
-             selectedWeek === 1 ? 'Next Week' : 
-             `Week ${selectedWeek + 1}`}
+            {getWeekTitle()}
           </Text>
           
           <TouchableOpacity 
@@ -326,12 +373,14 @@ const MealPlanScreen = () => {
           </TouchableOpacity>
 
           <View style={styles.dayInfo}>
-            <Text style={styles.dayName}>{currentDayName}</Text>
+            <Text style={[styles.dayName, isToday(selectedDay) && styles.todayText]}>
+              {currentDayName}
+              {isToday(selectedDay) && (
+                <Text style={styles.todayLabel}> (Today)</Text>
+              )}
+            </Text>
             <Text style={styles.dayDate}>
-              {new Date(Date.now() + (selectedDay + selectedWeek * 7) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
-              })}
+              {formatDateForDisplay(selectedDayDate)}
             </Text>
           </View>
 
@@ -363,6 +412,9 @@ const MealPlanScreen = () => {
         <View style={styles.dailyMealsCard}>
           <Text style={styles.dailyMealsTitle}>
             {currentDayName}'s Meals
+            {isToday(selectedDay) && (
+              <Text style={styles.todayMealsLabel}> (Today)</Text>
+            )}
           </Text>
           
           {mealTypes.map((mealType) => {
@@ -429,6 +481,13 @@ const MealPlanScreen = () => {
                       isToday(index) && styles.weekGridHeaderTextToday,
                     ]}>
                       {day}
+                    </Text>
+                    <Text style={[
+                      styles.weekGridDateText,
+                      selectedDay === index && styles.weekGridHeaderTextSelected,
+                      isToday(index) && styles.weekGridHeaderTextToday,
+                    ]}>
+                      {getDateForDay(index).getDate()}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -622,6 +681,14 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 4,
   },
+  todayText: {
+    color: '#F59E0B',
+  },
+  todayLabel: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#F59E0B',
+  },
   dayDate: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
@@ -665,6 +732,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
     marginBottom: 20,
+  },
+  todayMealsLabel: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#F59E0B',
   },
   mealSection: {
     marginBottom: 24,
@@ -769,11 +841,11 @@ const styles = StyleSheet.create({
   },
   weekGridCell: {
     width: 60,
-    height: 32,
+    height: 40,
   },
   weekGridHeaderCell: {
     width: 44,
-    height: 32,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
@@ -790,6 +862,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Inter-SemiBold',
     color: '#6B7280',
+  },
+  weekGridDateText: {
+    fontSize: 9,
+    fontFamily: 'Inter-Regular',
+    color: '#9CA3AF',
+    marginTop: 1,
   },
   weekGridHeaderTextSelected: {
     color: '#16A34A',

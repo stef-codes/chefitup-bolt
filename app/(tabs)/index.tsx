@@ -9,9 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target, Plus, Activity } from 'lucide-react-native';
+import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target, Plus, Activity, Droplets } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
+import BloodSugarModal from '../../components/BloodSugarModal';
 
 interface Recipe {
   id: number;
@@ -37,12 +38,24 @@ interface CarbEntry {
   notes?: string;
 }
 
+interface BloodSugarReading {
+  id: number;
+  value: number;
+  time: string;
+  date: string;
+  readingType: 'Fasting' | 'Before Meal' | 'After Meal' | 'Bedtime' | 'Random';
+  notes?: string;
+  mealContext?: string;
+}
+
 const HomeScreen = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [carbModalVisible, setCarbModalVisible] = useState(false);
+  const [bloodSugarModalVisible, setBloodSugarModalVisible] = useState(false);
   const [todaysCarbEntries, setTodaysCarbEntries] = useState<CarbEntry[]>([]);
+  const [bloodSugarReadings, setBloodSugarReadings] = useState<BloodSugarReading[]>([]);
 
   // Update current time every minute
   useEffect(() => {
@@ -79,6 +92,26 @@ const HomeScreen = () => {
       },
     ];
     setTodaysCarbEntries(sampleEntries);
+
+    // Initialize with sample blood sugar readings
+    const sampleReadings: BloodSugarReading[] = [
+      {
+        id: 1,
+        value: 95,
+        time: '7:30 AM',
+        date: new Date().toLocaleDateString('en-US'),
+        readingType: 'Fasting',
+      },
+      {
+        id: 2,
+        value: 140,
+        time: '2:15 PM',
+        date: new Date().toLocaleDateString('en-US'),
+        readingType: 'After Meal',
+        mealContext: 'Lunch',
+      },
+    ];
+    setBloodSugarReadings(sampleReadings);
   }, []);
 
   // Get appropriate greeting based on time of day
@@ -100,12 +133,25 @@ const HomeScreen = () => {
   const todaysCarbTotal = todaysCarbEntries.reduce((total, entry) => total + entry.carbs, 0);
   const carbTarget = 150; // User's daily carb target
 
+  // Get latest blood sugar reading
+  const latestBloodSugar = bloodSugarReadings.length > 0 
+    ? bloodSugarReadings[bloodSugarReadings.length - 1] 
+    : null;
+
+  const getBloodSugarStatus = (value: number) => {
+    if (value < 70) return { status: 'Low', color: '#EF4444' };
+    if (value <= 140) return { status: 'Normal', color: '#10B981' };
+    if (value <= 180) return { status: 'High', color: '#F59E0B' };
+    return { status: 'Very High', color: '#DC2626' };
+  };
+
   const todayStats = {
     carbsConsumed: todaysCarbTotal,
     carbsTarget: carbTarget,
     mealsPrepped: 3,
     nextMeal: 'Dinner',
     nextMealTime: '6:00 PM',
+    bloodSugar: latestBloodSugar,
   };
 
   const weeklyGoals = [
@@ -218,6 +264,15 @@ const HomeScreen = () => {
     );
   };
 
+  const handleBloodSugarSave = (reading: BloodSugarReading) => {
+    setBloodSugarReadings([...bloodSugarReadings, reading]);
+    Alert.alert(
+      'Blood Sugar Logged!',
+      `Recorded ${reading.value} mg/dL reading`,
+      [{ text: 'OK' }]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -285,6 +340,50 @@ const HomeScreen = () => {
           )}
         </View>
 
+        {/* Blood Sugar Card */}
+        <View style={styles.bloodSugarCard}>
+          <View style={styles.bloodSugarHeader}>
+            <View style={styles.bloodSugarTitleContainer}>
+              <Droplets size={24} color="#10B981" />
+              <Text style={styles.bloodSugarTitle}>Blood Sugar</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.bloodSugarLogButton}
+              onPress={() => setBloodSugarModalVisible(true)}
+            >
+              <Plus size={16} color="#ffffff" />
+              <Text style={styles.bloodSugarLogText}>Log</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {latestBloodSugar ? (
+            <View style={styles.bloodSugarContent}>
+              <View style={styles.bloodSugarMain}>
+                <Text style={[
+                  styles.bloodSugarValue,
+                  { color: getBloodSugarStatus(latestBloodSugar.value).color }
+                ]}>
+                  {latestBloodSugar.value}
+                </Text>
+                <Text style={styles.bloodSugarUnit}>mg/dL</Text>
+              </View>
+              <View style={styles.bloodSugarMeta}>
+                <Text style={styles.bloodSugarStatus}>
+                  {getBloodSugarStatus(latestBloodSugar.value).status}
+                </Text>
+                <Text style={styles.bloodSugarTime}>
+                  {latestBloodSugar.readingType} • {latestBloodSugar.time}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.bloodSugarEmpty}>
+              <Text style={styles.bloodSugarEmptyText}>No readings today</Text>
+              <Text style={styles.bloodSugarEmptySubtext}>Tap "Log" to add your first reading</Text>
+            </View>
+          )}
+        </View>
+
         {/* Today's Progress */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Today's Progress</Text>
@@ -300,7 +399,9 @@ const HomeScreen = () => {
                 <Activity size={16} color="#10B981" />
                 <Text style={styles.progressLabel}>Blood Sugar</Text>
               </View>
-              <Text style={styles.progressNumber}>Stable</Text>
+              <Text style={styles.progressNumber}>
+                {latestBloodSugar ? getBloodSugarStatus(latestBloodSugar.value).status : 'No Data'}
+              </Text>
               <Text style={styles.progressTarget}>last reading</Text>
             </View>
           </View>
@@ -355,6 +456,13 @@ const HomeScreen = () => {
             >
               <Target size={24} color="#16A34A" />
               <Text style={styles.actionText}>Log Carbs</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => setBloodSugarModalVisible(true)}
+            >
+              <Droplets size={24} color="#16A34A" />
+              <Text style={styles.actionText}>Log Blood Sugar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -419,6 +527,13 @@ const HomeScreen = () => {
         visible={carbModalVisible}
         onClose={() => setCarbModalVisible(false)}
         onSave={handleCarbEntrySave}
+      />
+
+      {/* Blood Sugar Modal */}
+      <BloodSugarModal
+        visible={bloodSugarModalVisible}
+        onClose={() => setBloodSugarModalVisible(false)}
+        onSave={handleBloodSugarSave}
       />
     </SafeAreaView>
   );
@@ -557,6 +672,94 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#16A34A',
   },
+  bloodSugarCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  bloodSugarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  bloodSugarTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  bloodSugarTitle: {
+    fontSize: 20,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+  },
+  bloodSugarLogButton: {
+    backgroundColor: '#10B981',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  bloodSugarLogText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#ffffff',
+  },
+  bloodSugarContent: {
+    alignItems: 'center',
+  },
+  bloodSugarMain: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 8,
+  },
+  bloodSugarValue: {
+    fontSize: 36,
+    fontFamily: 'Inter-Bold',
+    marginRight: 4,
+  },
+  bloodSugarUnit: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  bloodSugarMeta: {
+    alignItems: 'center',
+  },
+  bloodSugarStatus: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  bloodSugarTime: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  bloodSugarEmpty: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  bloodSugarEmptyText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  bloodSugarEmptySubtext: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#9CA3AF',
+  },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -661,10 +864,12 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
   actionButton: {
     flex: 1,
+    minWidth: '30%',
     backgroundColor: '#DCFCE7',
     borderRadius: 12,
     padding: 16,
@@ -675,6 +880,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#16A34A',
     marginTop: 8,
+    textAlign: 'center',
   },
   sectionHeader: {
     flexDirection: 'row',

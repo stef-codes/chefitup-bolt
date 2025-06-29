@@ -294,111 +294,111 @@ const ShoppingScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Shopping List</Text>
-        <Text style={styles.subtitle}>
-          {getMealPlanItemsCount() > 0 
-            ? `${getMealPlanItemsCount()} items from meal plan`
-            : 'Add items or generate from meal plan'
-          }
-        </Text>
-      </View>
-
-      {/* Shopping Summary */}
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <ShoppingCart size={20} color="#16A34A" />
-            <View style={styles.summaryText}>
-              <Text style={styles.summaryValue}>
-                {getCheckedCount()}/{shoppingList.length}
-              </Text>
-              <Text style={styles.summaryLabel}>Items</Text>
-            </View>
-          </View>
-          
-          <View style={styles.summaryDivider} />
-          
-          <View style={styles.summaryItem}>
-            <DollarSign size={20} color="#10B981" />
-            <View style={styles.summaryText}>
-              <Text style={styles.summaryValue}>
-                ${getCheckedPrice().toFixed(2)}
-              </Text>
-              <Text style={styles.summaryLabel}>
-                of ${getTotalPrice().toFixed(2)}
-              </Text>
-            </View>
-          </View>
-        </View>
-        
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { width: shoppingList.length > 0 ? `${(getCheckedCount() / shoppingList.length) * 100}%` : '0%' }
-              ]} 
-            />
-          </View>
-          <Text style={styles.progressText}>
-            {shoppingList.length > 0 ? Math.round((getCheckedCount() / shoppingList.length) * 100) : 0}% complete
+      <ScrollView style={styles.mainScrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Shopping List</Text>
+          <Text style={styles.subtitle}>
+            {getMealPlanItemsCount() > 0 
+              ? `${getMealPlanItemsCount()} items from meal plan`
+              : 'Add items or generate from meal plan'
+            }
           </Text>
         </View>
-      </View>
 
-      {/* Quick Actions */}
-      <View style={styles.quickActionsCard}>
-        <View style={styles.quickActionsRow}>
-          <TouchableOpacity 
-            style={[styles.quickActionButton, styles.generateButton]}
-            onPress={generateShoppingListFromMealPlan}
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <RefreshCw size={18} color="#ffffff" style={{ transform: [{ rotate: '45deg' }] }} />
-            ) : (
-              <Calendar size={18} color="#ffffff" />
-            )}
-            <Text style={styles.generateButtonText}>
-              {isGenerating ? 'Generating...' : 'From Meal Plan'}
-            </Text>
-          </TouchableOpacity>
+        {/* Shopping Summary */}
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryItem}>
+              <ShoppingCart size={20} color="#16A34A" />
+              <View style={styles.summaryText}>
+                <Text style={styles.summaryValue}>
+                  {getCheckedCount()}/{shoppingList.length}
+                </Text>
+                <Text style={styles.summaryLabel}>Items</Text>
+              </View>
+            </View>
+            
+            <View style={styles.summaryDivider} />
+            
+            <View style={styles.summaryItem}>
+              <DollarSign size={20} color="#10B981" />
+              <View style={styles.summaryText}>
+                <Text style={styles.summaryValue}>
+                  ${getCheckedPrice().toFixed(2)}
+                </Text>
+                <Text style={styles.summaryLabel}>
+                  of ${getTotalPrice().toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </View>
           
-          <TouchableOpacity 
-            style={[styles.quickActionButton, styles.clearButton]}
-            onPress={clearList}
-            disabled={shoppingList.length === 0}
-          >
-            <Trash2 size={18} color={shoppingList.length === 0 ? '#9CA3AF' : '#EF4444'} />
-            <Text style={[
-              styles.clearButtonText,
-              shoppingList.length === 0 && styles.clearButtonTextDisabled
-            ]}>
-              Clear All
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: shoppingList.length > 0 ? `${(getCheckedCount() / shoppingList.length) * 100}%` : '0%' }
+                ]} 
+              />
+            </View>
+            <Text style={styles.progressText}>
+              {shoppingList.length > 0 ? Math.round((getCheckedCount() / shoppingList.length) * 100) : 0}% complete
             </Text>
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {/* Add New Item */}
-      <View style={styles.addItemCard}>
-        <View style={styles.addItemContainer}>
-          <TextInput
-            style={styles.addItemInput}
-            placeholder="Add custom item..."
-            value={newItem}
-            onChangeText={setNewItem}
-            onSubmitEditing={addItem}
-          />
-          <TouchableOpacity style={styles.addButton} onPress={addItem}>
-            <Plus size={20} color="#ffffff" />
-          </TouchableOpacity>
+        {/* Quick Actions */}
+        <View style={styles.quickActionsCard}>
+          <View style={styles.quickActionsRow}>
+            <TouchableOpacity 
+              style={[styles.quickActionButton, styles.generateButton]}
+              onPress={generateShoppingListFromMealPlan}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <RefreshCw size={18} color="#ffffff" style={{ transform: [{ rotate: '45deg' }] }} />
+              ) : (
+                <Calendar size={18} color="#ffffff" />
+              )}
+              <Text style={styles.generateButtonText}>
+                {isGenerating ? 'Generating...' : 'From Meal Plan'}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.quickActionButton, styles.clearButton]}
+              onPress={clearList}
+              disabled={shoppingList.length === 0}
+            >
+              <Trash2 size={18} color={shoppingList.length === 0 ? '#9CA3AF' : '#EF4444'} />
+              <Text style={[
+                styles.clearButtonText,
+                shoppingList.length === 0 && styles.clearButtonTextDisabled
+              ]}>
+                Clear All
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {/* Shopping List by Category */}
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Add New Item */}
+        <View style={styles.addItemCard}>
+          <View style={styles.addItemContainer}>
+            <TextInput
+              style={styles.addItemInput}
+              placeholder="Add custom item..."
+              value={newItem}
+              onChangeText={setNewItem}
+              onSubmitEditing={addItem}
+            />
+            <TouchableOpacity style={styles.addButton} onPress={addItem}>
+              <Plus size={20} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Shopping List by Category */}
         {shoppingList.length === 0 ? (
           <View style={styles.emptyState}>
             <ShoppingCart size={48} color="#D1D5DB" />
@@ -415,74 +415,77 @@ const ShoppingScreen = () => {
             </TouchableOpacity>
           </View>
         ) : (
-          categories.map(category => {
-            const categoryItems = getItemsByCategory(category);
-            
-            if (categoryItems.length === 0) return null;
-            
-            return (
-              <View key={category} style={styles.categorySection}>
-                <View style={styles.categoryHeader}>
-                  <Text style={styles.categoryTitle}>{category}</Text>
-                  <Text style={styles.categoryCount}>
-                    {categoryItems.filter(item => item.checked).length}/{categoryItems.length}
-                  </Text>
-                </View>
-                {categoryItems.map(item => (
-                  <View key={item.id} style={styles.itemRow}>
-                    <TouchableOpacity
-                      style={styles.itemCheck}
-                      onPress={() => toggleItem(item.id)}
-                    >
-                      <View style={[
-                        styles.checkbox,
-                        item.checked && styles.checkboxChecked
-                      ]}>
-                        {item.checked && (
-                          <Check size={16} color="#ffffff" />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    
-                    <View style={styles.itemDetails}>
-                      <View style={styles.itemNameRow}>
-                        <Text style={[
-                          styles.itemName,
-                          item.checked && styles.itemNameChecked
-                        ]}>
-                          {item.name}
-                        </Text>
-                        {item.fromMealPlan && (
-                          <View style={styles.mealPlanBadge}>
-                            <Text style={styles.mealPlanBadgeText}>MP</Text>
-                          </View>
-                        )}
-                      </View>
-                      <View style={styles.itemMeta}>
-                        <Text style={styles.itemQuantity}>{item.quantity}</Text>
-                        {item.price > 0 && (
-                          <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
-                        )}
-                      </View>
-                    </View>
-                    
-                    <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={() => removeItem(item.id)}
-                    >
-                      <Trash2 size={18} color="#EF4444" />
-                    </TouchableOpacity>
+          <View style={styles.listContainer}>
+            {categories.map(category => {
+              const categoryItems = getItemsByCategory(category);
+              
+              if (categoryItems.length === 0) return null;
+              
+              return (
+                <View key={category} style={styles.categorySection}>
+                  <View style={styles.categoryHeader}>
+                    <Text style={styles.categoryTitle}>{category}</Text>
+                    <Text style={styles.categoryCount}>
+                      {categoryItems.filter(item => item.checked).length}/{categoryItems.length}
+                    </Text>
                   </View>
-                ))}
-              </View>
-            );
-          })
+                  {categoryItems.map(item => (
+                    <View key={item.id} style={styles.itemRow}>
+                      <TouchableOpacity
+                        style={styles.itemCheck}
+                        onPress={() => toggleItem(item.id)}
+                      >
+                        <View style={[
+                          styles.checkbox,
+                          item.checked && styles.checkboxChecked
+                        ]}>
+                          {item.checked && (
+                            <Check size={16} color="#ffffff" />
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                      
+                      <View style={styles.itemDetails}>
+                        <View style={styles.itemNameRow}>
+                          <Text style={[
+                            styles.itemName,
+                            item.checked && styles.itemNameChecked
+                          ]}>
+                            {item.name}
+                          </Text>
+                          {item.fromMealPlan && (
+                            <View style={styles.mealPlanBadge}>
+                              <Text style={styles.mealPlanBadgeText}>MP</Text>
+                            </View>
+                          )}
+                        </View>
+                        <View style={styles.itemMeta}>
+                          <Text style={styles.itemQuantity}>{item.quantity}</Text>
+                          {item.price > 0 && (
+                            <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                          )}
+                        </View>
+                      </View>
+                      
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeItem(item.id)}
+                      >
+                        <Trash2 size={18} color="#EF4444" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
+          </View>
         )}
-        
-        <View style={styles.bottomPadding} />
+
+        {/* Bottom spacing for action buttons */}
+        <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Fixed at bottom */}
       {shoppingList.length > 0 && (
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.primaryButton}>
@@ -503,8 +506,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
+  mainScrollView: {
+    flex: 1,
+  },
   header: {
     paddingHorizontal: 16,
+    paddingTop: 8,
     marginBottom: 20,
   },
   title: {
@@ -658,15 +665,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
     paddingHorizontal: 32,
+    marginHorizontal: 16,
   },
   emptyStateTitle: {
     fontSize: 20,
@@ -696,6 +700,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#16A34A',
+  },
+  listContainer: {
+    paddingHorizontal: 16,
   },
   categorySection: {
     marginBottom: 24,
@@ -794,10 +801,14 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 8,
   },
-  bottomPadding: {
-    height: 100,
+  bottomSpacing: {
+    height: 120, // Space for fixed action buttons
   },
   actionButtons: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 16,
@@ -805,6 +816,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 5,
   },
   primaryButton: {
     flex: 1,

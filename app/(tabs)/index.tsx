@@ -9,8 +9,9 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target } from 'lucide-react-native';
+import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target, Plus, Activity } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
+import CarbCounterModal from '../../components/CarbCounterModal';
 
 interface Recipe {
   id: number;
@@ -27,10 +28,21 @@ interface Recipe {
   isFavorite: boolean;
 }
 
+interface CarbEntry {
+  id: number;
+  name: string;
+  carbs: number;
+  time: string;
+  mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
+  notes?: string;
+}
+
 const HomeScreen = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [carbModalVisible, setCarbModalVisible] = useState(false);
+  const [todaysCarbEntries, setTodaysCarbEntries] = useState<CarbEntry[]>([]);
 
   // Update current time every minute
   useEffect(() => {
@@ -39,6 +51,34 @@ const HomeScreen = () => {
     }, 60000); // Update every minute
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Initialize with some sample carb entries
+  useEffect(() => {
+    const sampleEntries: CarbEntry[] = [
+      {
+        id: 1,
+        name: 'Greek Yogurt with Berries',
+        carbs: 28,
+        time: '8:30 AM',
+        mealType: 'Breakfast',
+      },
+      {
+        id: 2,
+        name: 'Apple',
+        carbs: 25,
+        time: '10:15 AM',
+        mealType: 'Snack',
+      },
+      {
+        id: 3,
+        name: 'Quinoa Salad',
+        carbs: 45,
+        time: '12:45 PM',
+        mealType: 'Lunch',
+      },
+    ];
+    setTodaysCarbEntries(sampleEntries);
   }, []);
 
   // Get appropriate greeting based on time of day
@@ -56,9 +96,13 @@ const HomeScreen = () => {
     }
   };
 
+  // Calculate today's carb totals
+  const todaysCarbTotal = todaysCarbEntries.reduce((total, entry) => total + entry.carbs, 0);
+  const carbTarget = 150; // User's daily carb target
+
   const todayStats = {
-    carbsConsumed: 85,
-    carbsTarget: 150,
+    carbsConsumed: todaysCarbTotal,
+    carbsTarget: carbTarget,
     mealsPrepped: 3,
     nextMeal: 'Dinner',
     nextMealTime: '6:00 PM',
@@ -144,16 +188,32 @@ const HomeScreen = () => {
     }
   };
 
+  const getCarbProgressColor = () => {
+    const percentage = (todayStats.carbsConsumed / todayStats.carbsTarget) * 100;
+    if (percentage <= 50) return '#EF4444';
+    if (percentage <= 80) return '#F59E0B';
+    if (percentage <= 100) return '#16A34A';
+    return '#DC2626';
+  };
+
   const handleRecipePress = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
     setModalVisible(true);
   };
 
   const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
-    // Here you would typically save this to your app's state management or backend
     Alert.alert(
       'Added to Meal Plan!',
       `${recipe.name} has been added to ${day} ${mealType}`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleCarbEntrySave = (entry: CarbEntry) => {
+    setTodaysCarbEntries([...todaysCarbEntries, entry]);
+    Alert.alert(
+      'Carbs Logged!',
+      `Added ${entry.carbs}g carbs from ${entry.name}`,
       [{ text: 'OK' }]
     );
   };
@@ -167,20 +227,81 @@ const HomeScreen = () => {
           <Text style={styles.subtitle}>Ready to prep some healthy meals?</Text>
         </View>
 
+        {/* Enhanced Carb Progress Card */}
+        <View style={styles.carbProgressCard}>
+          <View style={styles.carbProgressHeader}>
+            <View style={styles.carbProgressTitleContainer}>
+              <Target size={24} color="#16A34A" />
+              <Text style={styles.carbProgressTitle}>Today's Carbs</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.quickLogButton}
+              onPress={() => setCarbModalVisible(true)}
+            >
+              <Plus size={16} color="#ffffff" />
+              <Text style={styles.quickLogText}>Log</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.carbProgressMain}>
+            <Text style={styles.carbProgressValue}>
+              {todayStats.carbsConsumed}g
+            </Text>
+            <Text style={styles.carbProgressTarget}>
+              of {todayStats.carbsTarget}g
+            </Text>
+          </View>
+          
+          <View style={styles.carbProgressBar}>
+            <View 
+              style={[
+                styles.carbProgressFill,
+                { 
+                  width: `${Math.min((todayStats.carbsConsumed / todayStats.carbsTarget) * 100, 100)}%`,
+                  backgroundColor: getCarbProgressColor()
+                }
+              ]} 
+            />
+          </View>
+          
+          <Text style={styles.carbProgressPercentage}>
+            {Math.round((todayStats.carbsConsumed / todayStats.carbsTarget) * 100)}% of daily target
+          </Text>
+
+          {/* Recent Carb Entries */}
+          {todaysCarbEntries.length > 0 && (
+            <View style={styles.recentCarbEntries}>
+              <Text style={styles.recentCarbTitle}>Recent Entries</Text>
+              {todaysCarbEntries.slice(-3).map((entry) => (
+                <View key={entry.id} style={styles.carbEntryItem}>
+                  <View style={styles.carbEntryInfo}>
+                    <Text style={styles.carbEntryName}>{entry.name}</Text>
+                    <Text style={styles.carbEntryTime}>{entry.time}</Text>
+                  </View>
+                  <Text style={styles.carbEntryValue}>{entry.carbs}g</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
         {/* Today's Progress */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Today's Progress</Text>
           <View style={styles.progressRow}>
             <View style={styles.progressItem}>
-              <Text style={styles.progressNumber}>{todayStats.carbsConsumed}g</Text>
-              <Text style={styles.progressLabel}>Carbs</Text>
-              <Text style={styles.progressTarget}>of {todayStats.carbsTarget}g</Text>
-            </View>
-            <View style={styles.progressDivider} />
-            <View style={styles.progressItem}>
               <Text style={styles.progressNumber}>{todayStats.mealsPrepped}</Text>
               <Text style={styles.progressLabel}>Meals Prepped</Text>
               <Text style={styles.progressTarget}>this week</Text>
+            </View>
+            <View style={styles.progressDivider} />
+            <View style={styles.progressItem}>
+              <View style={styles.progressItemHeader}>
+                <Activity size={16} color="#10B981" />
+                <Text style={styles.progressLabel}>Blood Sugar</Text>
+              </View>
+              <Text style={styles.progressNumber}>Stable</Text>
+              <Text style={styles.progressTarget}>last reading</Text>
             </View>
           </View>
           
@@ -228,9 +349,12 @@ const HomeScreen = () => {
               <Calendar size={24} color="#16A34A" />
               <Text style={styles.actionText}>Plan This Week</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <ChefHat size={24} color="#16A34A" />
-              <Text style={styles.actionText}>Browse Recipes</Text>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => setCarbModalVisible(true)}
+            >
+              <Target size={24} color="#16A34A" />
+              <Text style={styles.actionText}>Log Carbs</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -289,6 +413,13 @@ const HomeScreen = () => {
         }}
         onAddToMealPlan={handleAddToMealPlan}
       />
+
+      {/* Carb Counter Modal */}
+      <CarbCounterModal
+        visible={carbModalVisible}
+        onClose={() => setCarbModalVisible(false)}
+        onSave={handleCarbEntrySave}
+      />
     </SafeAreaView>
   );
 };
@@ -317,6 +448,115 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
+  carbProgressCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  carbProgressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  carbProgressTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  carbProgressTitle: {
+    fontSize: 20,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+  },
+  quickLogButton: {
+    backgroundColor: '#16A34A',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  quickLogText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#ffffff',
+  },
+  carbProgressMain: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  carbProgressValue: {
+    fontSize: 36,
+    fontFamily: 'Inter-Bold',
+    color: '#16A34A',
+    marginBottom: 4,
+  },
+  carbProgressTarget: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  carbProgressBar: {
+    height: 12,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  carbProgressFill: {
+    height: '100%',
+    borderRadius: 6,
+  },
+  carbProgressPercentage: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  recentCarbEntries: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  recentCarbTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  carbEntryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  carbEntryInfo: {
+    flex: 1,
+  },
+  carbEntryName: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#111827',
+  },
+  carbEntryTime: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  carbEntryValue: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#16A34A',
+  },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -342,6 +582,12 @@ const styles = StyleSheet.create({
   progressItem: {
     flex: 1,
     alignItems: 'center',
+  },
+  progressItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
   },
   progressNumber: {
     fontSize: 32,

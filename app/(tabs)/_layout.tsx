@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { Chrome as Home, BookOpen, Calendar, ShoppingCart, User, Target } from 'lucide-react-native';
+import { Chrome as Home, Calendar, ShoppingCart, User, Target } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -42,15 +42,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="recipes"
-        options={{
-          title: 'Recipes',
-          tabBarIcon: ({ size, color }) => (
-            <BookOpen size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="meal-plan"
         options={{
           title: 'Meals',
@@ -75,6 +66,12 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <User size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="recipes"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

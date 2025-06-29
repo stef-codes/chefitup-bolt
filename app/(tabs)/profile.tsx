@@ -6,19 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Target, TrendingUp, Bell, LogOut, ChevronRight, Award, Calendar } from 'lucide-react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import { router } from 'expo-router';
+import { User, Settings, Heart, Target, TrendingUp, Bell, ChevronRight, Award, Calendar } from 'lucide-react-native';
 
 const ProfileScreen = () => {
-  const { user, signOut } = useAuth();
-
   const userProfile = {
-    name: user?.user_metadata?.full_name || 'User',
-    email: user?.email || '',
+    name: 'Sarah Johnson',
+    email: 'sarah.johnson@email.com',
     diabetesType: 'Type 2',
     carbBudget: 150,
     joinDate: 'March 2024',
@@ -40,33 +35,11 @@ const ProfileScreen = () => {
   ];
 
   const menuItems = [
-    { icon: Settings, title: 'Settings', action: () => {} },
-    { icon: Heart, title: 'Health Profile', action: () => {} },
-    { icon: TrendingUp, title: 'Progress Report', action: () => {} },
-    { icon: Bell, title: 'Notifications', action: () => {} },
+    { icon: Settings, title: 'Settings', subtitle: 'App preferences and notifications', action: () => {} },
+    { icon: Heart, title: 'Health Profile', subtitle: 'Update diabetes and dietary info', action: () => {} },
+    { icon: TrendingUp, title: 'Progress Report', subtitle: 'View detailed analytics', action: () => {} },
+    { icon: Bell, title: 'Reminders', subtitle: 'Meal prep and eating reminders', action: () => {} },
   ];
-
-  const handleSignOut = async () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            const { error } = await signOut();
-            if (error) {
-              Alert.alert('Error', 'Failed to sign out');
-            } else {
-              router.replace('/auth');
-            }
-          },
-        },
-      ]
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -142,7 +115,7 @@ const ProfileScreen = () => {
           </View>
         </View>
 
-        {/* Simplified Menu Items */}
+        {/* Menu Items */}
         <View style={styles.menuCard}>
           {menuItems.map((item, index) => {
             const IconComponent = item.icon;
@@ -152,19 +125,16 @@ const ProfileScreen = () => {
                   <View style={styles.menuIcon}>
                     <IconComponent size={20} color="#16A34A" />
                   </View>
-                  <Text style={styles.menuTitle}>{item.title}</Text>
+                  <View style={styles.menuText}>
+                    <Text style={styles.menuTitle}>{item.title}</Text>
+                    <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                  </View>
                 </View>
                 <ChevronRight size={20} color="#9CA3AF" />
               </TouchableOpacity>
             );
           })}
         </View>
-
-        {/* Sign Out */}
-        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <LogOut size={20} color="#EF4444" />
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
 
         {/* App Info */}
         <View style={styles.appInfo}>
@@ -389,30 +359,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
+  menuText: {
+    flex: 1,
+  },
   menuTitle: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
+    marginBottom: 2,
   },
-  signOutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  signOutText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#EF4444',
+  menuSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
   },
   appInfo: {
     alignItems: 'center',

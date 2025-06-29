@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,32 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Clock, TrendingUp, Calendar, ChefHat, Heart, Target } from 'lucide-react-native';
 
 const HomeScreen = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Get appropriate greeting based on time of day
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    
+    if (hour >= 5 && hour < 12) {
+      return 'Good morning!';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good afternoon!';
+    } else if (hour >= 17 && hour < 22) {
+      return 'Good evening!';
+    } else {
+      return 'Good night!';
+    }
+  };
+
   const todayStats = {
     carbsConsumed: 85,
     carbsTarget: 150,
@@ -72,7 +98,7 @@ const HomeScreen = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Good morning!</Text>
+          <Text style={styles.greeting}>{getGreeting()}</Text>
           <Text style={styles.subtitle}>Ready to prep some healthy meals?</Text>
         </View>
 

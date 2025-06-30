@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   headerContainer: {
-    marginTop: 24,
+    marginTop: 40, // Increased from 24 to 40 for more top padding
     marginBottom: 24,
   },
   header: {

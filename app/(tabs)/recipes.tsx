@@ -904,15 +904,15 @@ const RecipesScreen = () => {
                       <Clock size={14} color="#6B7280" />
                       <Text style={styles.metaText}>{recipe.prepTime}m</Text>
                     </View>
-                    <View style={styles.metaItem}>
-                      <Users size={14} color="#6B7280" />
-                      <Text style={styles.metaText}>{recipe.servings}</Text>
-                    </View>
                     <View style={[
                       styles.giIndicator,
                       { backgroundColor: getGIColor(recipe.glycemicIndex) }
                     ]}>
                       <Text style={styles.giText}>{recipe.glycemicIndex} GI</Text>
+                    </View>
+                    <View style={styles.metaItem}>
+                      <Users size={14} color="#6B7280" />
+                      <Text style={styles.metaText}>{recipe.servings}</Text>
                     </View>
                   </View>
                 </View>

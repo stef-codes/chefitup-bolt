@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
@@ -267,6 +268,10 @@ const HomeScreen = () => {
     );
   };
 
+  const handleSeeAllRecipes = () => {
+    router.push('/(tabs)/recipes');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -362,36 +367,6 @@ const HomeScreen = () => {
           )}
         </View>
 
-        {/* Today's Progress */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Today's Progress</Text>
-          <View style={styles.progressRow}>
-            <View style={styles.progressItem}>
-              <Text style={styles.progressNumber}>{todayStats.mealsPrepped}</Text>
-              <Text style={styles.progressLabel}>Meals Prepped</Text>
-              <Text style={styles.progressTarget}>this week</Text>
-            </View>
-            <View style={styles.progressDivider} />
-            <View style={styles.progressItem}>
-              <View style={styles.progressItemHeader}>
-                <Activity size={16} color="#10B981" />
-                <Text style={styles.progressLabel}>Blood Sugar</Text>
-              </View>
-              <Text style={styles.progressNumber}>
-                {latestBloodSugar ? getBloodSugarStatus(latestBloodSugar.value).status : 'No Data'}
-              </Text>
-              <Text style={styles.progressTarget}>last reading</Text>
-            </View>
-          </View>
-          
-          <View style={styles.nextMealContainer}>
-            <Clock size={20} color="#16A34A" />
-            <Text style={styles.nextMealText}>
-              Next meal: {todayStats.nextMeal} at {todayStats.nextMealTime}
-            </Text>
-          </View>
-        </View>
-
         {/* Quick Actions */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Quick Actions</Text>
@@ -421,7 +396,7 @@ const HomeScreen = () => {
         <View style={styles.card}>
           <View style={styles.sectionHeader}>
             <Text style={styles.cardTitle}>Recent Recipes</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleSeeAllRecipes}>
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -690,56 +665,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#111827',
     marginBottom: 16,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  progressItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  progressItemHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 4,
-  },
-  progressNumber: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#16A34A',
-    marginBottom: 4,
-  },
-  progressLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#111827',
-  },
-  progressTarget: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-  },
-  progressDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#E5E7EB',
-    marginHorizontal: 20,
-  },
-  nextMealContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#DCFCE7',
-    padding: 12,
-    borderRadius: 8,
-  },
-  nextMealText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#16A34A',
-    marginLeft: 8,
   },
   progressBar: {
     height: 6,

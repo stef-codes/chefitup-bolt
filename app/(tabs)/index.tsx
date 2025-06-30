@@ -290,7 +290,6 @@ const HomeScreen = () => {
           <View style={styles.header}>
             <View style={styles.greetingSection}>
               <Text style={styles.greeting}>{getGreeting()}</Text>
-              <Text style={styles.subtitle}>Ready to prep some healthy meals?</Text>
             </View>
             
             {/* Simple Profile Icon */}

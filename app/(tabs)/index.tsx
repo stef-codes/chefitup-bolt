@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets } from 'lucide-react-native';
+import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets, User, Settings } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
@@ -57,6 +57,15 @@ const HomeScreen = () => {
   const [bloodSugarModalVisible, setBloodSugarModalVisible] = useState(false);
   const [todaysCarbEntries, setTodaysCarbEntries] = useState<CarbEntry[]>([]);
   const [bloodSugarReadings, setBloodSugarReadings] = useState<BloodSugarReading[]>([]);
+  const [profileMenuVisible, setProfileMenuVisible] = useState(false);
+
+  // User profile data
+  const userProfile = {
+    name: 'Sarah Johnson',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+    diabetesType: 'Type 2',
+    carbBudget: 150,
+  };
 
   // Update current time every minute
   useEffect(() => {
@@ -272,13 +281,63 @@ const HomeScreen = () => {
     router.push('/(tabs)/recipes');
   };
 
+  const handleProfilePress = () => {
+    router.push('/(tabs)/profile');
+    setProfileMenuVisible(false);
+  };
+
+  const handleSettingsPress = () => {
+    // Navigate to settings or show settings modal
+    Alert.alert('Settings', 'Settings functionality coming soon!');
+    setProfileMenuVisible(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
-          <Text style={styles.subtitle}>Ready to prep some healthy meals?</Text>
+        {/* Header with Profile */}
+        <View style={styles.headerContainer}>
+          <View style={styles.header}>
+            <View style={styles.greetingSection}>
+              <Text style={styles.greeting}>{getGreeting()}</Text>
+              <Text style={styles.subtitle}>Ready to prep some healthy meals?</Text>
+            </View>
+            
+            {/* Profile Section */}
+            <View style={styles.profileSection}>
+              <TouchableOpacity 
+                style={styles.profileButton}
+                onPress={() => setProfileMenuVisible(!profileMenuVisible)}
+                activeOpacity={0.8}
+              >
+                <Image source={{ uri: userProfile.avatar }} style={styles.profileAvatar} />
+                <View style={styles.profileInfo}>
+                  <Text style={styles.profileName}>{userProfile.name}</Text>
+                  <Text style={styles.profileType}>{userProfile.diabetesType}</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Profile Dropdown Menu */}
+              {profileMenuVisible && (
+                <View style={styles.profileMenu}>
+                  <TouchableOpacity 
+                    style={styles.profileMenuItem}
+                    onPress={handleProfilePress}
+                  >
+                    <User size={20} color="#374151" />
+                    <Text style={styles.profileMenuText}>View Profile</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.profileMenuItem}
+                    onPress={handleSettingsPress}
+                  >
+                    <Settings size={20} color="#374151" />
+                    <Text style={styles.profileMenuText}>Settings</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </View>
         </View>
 
         {/* Enhanced Carb Progress Card */}
@@ -460,6 +519,15 @@ const HomeScreen = () => {
         onClose={() => setBloodSugarModalVisible(false)}
         onSave={handleBloodSugarSave}
       />
+
+      {/* Overlay to close profile menu */}
+      {profileMenuVisible && (
+        <TouchableOpacity 
+          style={styles.overlay}
+          onPress={() => setProfileMenuVisible(false)}
+          activeOpacity={1}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -473,9 +541,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
-  header: {
+  headerContainer: {
     marginTop: 24,
     marginBottom: 24,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  greetingSection: {
+    flex: 1,
   },
   greeting: {
     fontSize: 28,
@@ -487,6 +563,85 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
+  },
+  profileSection: {
+    position: 'relative',
+    marginLeft: 16,
+  },
+  profileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    minWidth: 160,
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 12,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  profileType: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#16A34A',
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  profileMenu: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 8,
+    marginTop: 8,
+    minWidth: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  profileMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    gap: 12,
+  },
+  profileMenuText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#374151',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    zIndex: 999,
   },
   carbProgressCard: {
     backgroundColor: '#ffffff',

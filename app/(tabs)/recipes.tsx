@@ -810,7 +810,9 @@ const RecipesScreen = () => {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#6B7280" />
+                      <View>
+              <Search size={20} color="#6B7280" />
+            </View>
           <TextInput
             style={styles.searchInput}
             placeholder="Search recipes..."
@@ -819,7 +821,9 @@ const RecipesScreen = () => {
           />
         </View>
         <TouchableOpacity style={styles.filterButton}>
-          <Filter size={20} color="#16A34A" />
+                      <View>
+              <Filter size={20} color="#16A34A" />
+            </View>
         </TouchableOpacity>
       </View>
 
@@ -901,7 +905,9 @@ const RecipesScreen = () => {
                   
                   <View style={styles.metaRow}>
                     <View style={styles.metaItem}>
-                      <Clock size={14} color="#6B7280" />
+                      <View>
+              <Clock size={14} color="#6B7280" />
+            </View>
                       <Text style={styles.metaText}>{recipe.prepTime}m</Text>
                     </View>
                     <View style={[
@@ -911,7 +917,9 @@ const RecipesScreen = () => {
                       <Text style={styles.giText}>{recipe.glycemicIndex} GI</Text>
                     </View>
                     <View style={styles.metaItem}>
-                      <Users size={14} color="#6B7280" />
+                      <View>
+              <Users size={14} color="#6B7280" />
+            </View>
                       <Text style={styles.metaText}>{recipe.servings}</Text>
                     </View>
                   </View>

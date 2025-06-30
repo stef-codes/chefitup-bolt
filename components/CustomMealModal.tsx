@@ -101,21 +101,27 @@ const CustomMealModal: React.FC<CustomMealModalProps> = ({
             style={styles.closeButton}
             onPress={handleClose}
           >
-            <X size={24} color="#111827" />
+            <View>
+              <X size={24} color="#111827" />
+            </View>
           </TouchableOpacity>
           <Text style={styles.title}>Add Custom Meal</Text>
           <TouchableOpacity 
             style={styles.saveButton}
             onPress={handleSave}
           >
-            <Save size={20} color="#16A34A" />
+            <View>
+              <Save size={20} color="#16A34A" />
+            </View>
           </TouchableOpacity>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Meal Type Indicator */}
           <View style={styles.mealTypeIndicator}>
-            <Clock size={16} color="#16A34A" />
+            <View>
+              <Clock size={16} color="#16A34A" />
+            </View>
             <Text style={styles.mealTypeText}>Adding to {mealType}</Text>
           </View>
 

@@ -616,7 +616,9 @@ const MealPlanScreen = () => {
             style={styles.navButton} 
             onPress={() => navigateWeek(-1)}
           >
-            <ChevronLeft size={20} color="#16A34A" />
+            <View>
+              <ChevronLeft size={20} color="#16A34A" />
+            </View>
           </TouchableOpacity>
           
           <Text style={styles.weekTitle}>
@@ -627,7 +629,9 @@ const MealPlanScreen = () => {
             style={styles.navButton} 
             onPress={() => navigateWeek(1)}
           >
-            <ChevronRight size={20} color="#16A34A" />
+            <View>
+              <ChevronRight size={20} color="#16A34A" />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -639,7 +643,9 @@ const MealPlanScreen = () => {
               style={styles.regenerateButton}
               onPress={generateRandomMealPlan}
             >
+              <View>
               <Shuffle size={16} color="#16A34A" />
+            </View>
               <Text style={styles.regenerateText}>Regenerate</Text>
             </TouchableOpacity>
           </View>
@@ -670,7 +676,9 @@ const MealPlanScreen = () => {
             onPress={() => navigateDay(-1)}
             disabled={selectedDay === 0}
           >
-            <ChevronLeft size={20} color={selectedDay === 0 ? '#9CA3AF' : '#16A34A'} />
+            <View>
+              <ChevronLeft size={20} color={selectedDay === 0 ? '#9CA3AF' : '#16A34A'} />
+            </View>
           </TouchableOpacity>
 
           <View style={styles.dayInfo}>
@@ -690,7 +698,9 @@ const MealPlanScreen = () => {
             onPress={() => navigateDay(1)}
             disabled={selectedDay === 6}
           >
-            <ChevronRight size={20} color={selectedDay === 6 ? '#9CA3AF' : '#16A34A'} />
+            <View>
+              <ChevronRight size={20} color={selectedDay === 6 ? '#9CA3AF' : '#16A34A'} />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -731,7 +741,9 @@ const MealPlanScreen = () => {
                     style={styles.swapButton}
                     onPress={() => handleMealCustomization(currentDayName, mealType)}
                   >
-                    <Shuffle size={14} color="#16A34A" />
+                    <View>
+              <Shuffle size={14} color="#16A34A" />
+            </View>
                     <Text style={styles.swapButtonText}>Swap</Text>
                   </TouchableOpacity>
                 </View>
@@ -750,11 +762,15 @@ const MealPlanScreen = () => {
                           <Text style={styles.mealStatLabel}>carbs</Text>
                         </View>
                         <View style={styles.mealStat}>
-                          <Clock size={14} color="#6B7280" />
+                          <View>
+              <Clock size={14} color="#6B7280" />
+            </View>
                           <Text style={styles.mealStatText}>{meal.prepTime}m</Text>
                         </View>
                         <View style={styles.mealStat}>
-                          <Users size={14} color="#6B7280" />
+                          <View>
+              <Users size={14} color="#6B7280" />
+            </View>
                           <Text style={styles.mealStatText}>{meal.servings}</Text>
                         </View>
                       </View>
@@ -765,7 +781,9 @@ const MealPlanScreen = () => {
                     style={styles.emptyMealCard}
                     onPress={() => handleMealCustomization(currentDayName, mealType)}
                   >
-                    <Plus size={24} color="#9CA3AF" />
+                    <View>
+              <Plus size={24} color="#9CA3AF" />
+            </View>
                     <Text style={styles.emptyMealText}>Add {mealType.toLowerCase()}</Text>
                   </TouchableOpacity>
                 )}
@@ -838,7 +856,9 @@ const MealPlanScreen = () => {
                           </View>
                         ) : (
                           <View style={styles.weekGridEmptyMeal}>
-                            <Plus size={12} color="#D1D5DB" />
+                            <View>
+              <Plus size={12} color="#D1D5DB" />
+            </View>
                           </View>
                         )}
                       </TouchableOpacity>
@@ -853,7 +873,9 @@ const MealPlanScreen = () => {
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.primaryButton} onPress={handleGenerateShoppingList}>
-            <Calendar size={20} color="#ffffff" />
+            <View>
+              <Calendar size={20} color="#ffffff" />
+            </View>
             <Text style={styles.primaryButtonText}>Generate Shopping List</Text>
           </TouchableOpacity>
         </View>

@@ -110,7 +110,9 @@ const BloodSugarModal: React.FC<BloodSugarModalProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <X size={24} color="#111827" />
+            <View>
+              <X size={24} color="#111827" />
+            </View>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Blood Sugar Reading</Text>
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -159,7 +161,9 @@ const BloodSugarModal: React.FC<BloodSugarModalProps> = ({
                 style={styles.adjustButton}
                 onPress={() => adjustValue(-5)}
               >
-                <Minus size={20} color="#16A34A" />
+                <View>
+                  <Minus size={20} color="#16A34A" />
+                </View>
               </TouchableOpacity>
               
               <TextInput
@@ -175,7 +179,9 @@ const BloodSugarModal: React.FC<BloodSugarModalProps> = ({
                 style={styles.adjustButton}
                 onPress={() => adjustValue(5)}
               >
-                <Activity size={20} color="#16A34A" />
+                <View>
+                  <Activity size={20} color="#16A34A" />
+                </View>
               </TouchableOpacity>
             </View>
             
@@ -196,7 +202,9 @@ const BloodSugarModal: React.FC<BloodSugarModalProps> = ({
             {currentValue > 0 && (
               <View style={[styles.statusIndicator, { borderColor: readingStatus.color }]}>
                 <View style={styles.statusHeader}>
+                  <View>
                   <StatusIcon size={20} color={readingStatus.color} />
+                </View>
                   <Text style={[styles.statusTitle, { color: readingStatus.color }]}>
                     {readingStatus.status}
                   </Text>

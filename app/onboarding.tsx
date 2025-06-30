@@ -54,7 +54,9 @@ const OnboardingScreen = () => {
   const renderStep0 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
-        <Heart size={48} color="#16A34A" />
+        <View>
+          <Heart size={48} color="#16A34A" />
+        </View>
       </View>
       <Text style={styles.stepTitle}>Welcome to ChefItUp</Text>
       <Text style={styles.stepDescription}>
@@ -85,7 +87,9 @@ const OnboardingScreen = () => {
   const renderStep1 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
-        <Target size={48} color="#16A34A" />
+        <View>
+          <Target size={48} color="#16A34A" />
+        </View>
       </View>
       <Text style={styles.stepTitle}>Your Goals</Text>
       <Text style={styles.stepDescription}>
@@ -161,7 +165,9 @@ const OnboardingScreen = () => {
   const renderStep3 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
-        <Clock size={48} color="#16A34A" />
+        <View>
+          <Clock size={48} color="#16A34A" />
+        </View>
       </View>
       <Text style={styles.stepTitle}>Cooking Experience</Text>
       <Text style={styles.stepDescription}>

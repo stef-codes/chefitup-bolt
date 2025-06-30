@@ -342,7 +342,9 @@ const ShoppingScreen = () => {
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
+              <View>
               <ShoppingCart size={20} color="#16A34A" />
+            </View>
               <View style={styles.summaryText}>
                 <Text style={styles.summaryValue}>
                   {getCheckedCount()}
@@ -378,9 +380,13 @@ const ShoppingScreen = () => {
               disabled={isGenerating}
             >
               {isGenerating ? (
-                <RefreshCw size={18} color="#ffffff" style={{ transform: [{ rotate: '45deg' }] }} />
+                <View>
+              <RefreshCw size={18} color="#ffffff" style={{ transform: [{ rotate: '45deg' }] }} />
+            </View>
               ) : (
-                <Calendar size={18} color="#ffffff" />
+                <View>
+                  <Calendar size={18} color="#ffffff" />
+                </View>
               )}
               <Text style={styles.generateButtonText}>
                 {isGenerating ? 'Generating...' : 'From Meal Plan'}
@@ -392,7 +398,9 @@ const ShoppingScreen = () => {
               onPress={clearList}
               disabled={shoppingList.length === 0}
             >
+              <View>
               <Trash2 size={18} color={shoppingList.length === 0 ? '#9CA3AF' : '#EF4444'} />
+            </View>
               <Text style={[
                 styles.clearButtonText,
                 shoppingList.length === 0 && styles.clearButtonTextDisabled
@@ -414,7 +422,9 @@ const ShoppingScreen = () => {
               onSubmitEditing={addItem}
             />
             <TouchableOpacity style={styles.addButton} onPress={addItem}>
+              <View>
               <Plus size={20} color="#ffffff" />
+            </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -422,7 +432,9 @@ const ShoppingScreen = () => {
         {/* Shopping List by Category */}
         {shoppingList.length === 0 ? (
           <View style={styles.emptyState}>
-            <ShoppingCart size={48} color="#D1D5DB" />
+            <View>
+              <ShoppingCart size={48} color="#D1D5DB" />
+            </View>
             <Text style={styles.emptyStateTitle}>Your shopping list is empty</Text>
             <Text style={styles.emptyStateText}>
               Generate items from your meal plan or add custom items
@@ -431,7 +443,9 @@ const ShoppingScreen = () => {
               style={styles.emptyStateButton}
               onPress={generateShoppingListFromMealPlan}
             >
+              <View>
               <Calendar size={20} color="#16A34A" />
+            </View>
               <Text style={styles.emptyStateButtonText}>Generate from Meal Plan</Text>
             </TouchableOpacity>
           </View>
@@ -461,7 +475,9 @@ const ShoppingScreen = () => {
                           item.checked && styles.checkboxChecked
                         ]}>
                           {item.checked && (
-                            <Check size={16} color="#ffffff" />
+                            <View>
+              <Check size={16} color="#ffffff" />
+            </View>
                           )}
                         </View>
                       </TouchableOpacity>
@@ -484,7 +500,9 @@ const ShoppingScreen = () => {
                         style={styles.deleteButton}
                         onPress={() => removeItem(item.id)}
                       >
-                        <Trash2 size={18} color="#EF4444" />
+                        <View>
+              <Trash2 size={18} color="#EF4444" />
+            </View>
                       </TouchableOpacity>
                     </View>
                   ))}
@@ -502,7 +520,9 @@ const ShoppingScreen = () => {
       {shoppingList.length > 0 && (
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.instacartButton} onPress={sendToInstacart}>
-            <ExternalLink size={20} color="#ffffff" />
+            <View>
+              <ExternalLink size={20} color="#ffffff" />
+            </View>
             <Text style={styles.instacartButtonText}>Send to Instacart</Text>
           </TouchableOpacity>
         </View>

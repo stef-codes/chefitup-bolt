@@ -397,7 +397,9 @@ const MealPlanCustomizationModal: React.FC<MealPlanCustomizationModalProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <X size={24} color="#111827" />
+            <View>
+              <X size={24} color="#111827" />
+            </View>
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Choose Recipe</Text>
@@ -429,7 +431,9 @@ const MealPlanCustomizationModal: React.FC<MealPlanCustomizationModalProps> = ({
         {/* Search and Filters */}
         <View style={styles.searchSection}>
           <View style={styles.searchContainer}>
-            <Search size={20} color="#6B7280" />
+            <View>
+              <Search size={20} color="#6B7280" />
+            </View>
             <TextInput
               style={styles.searchInput}
               placeholder="Search recipes..."
@@ -503,7 +507,9 @@ const MealPlanCustomizationModal: React.FC<MealPlanCustomizationModalProps> = ({
                     <View style={styles.recipeHeader}>
                       <Text style={styles.recipeName}>{recipe.name}</Text>
                       {recipe.isFavorite && (
-                        <Heart size={16} color="#EF4444" fill="#EF4444" />
+                        <View>
+              <Heart size={16} color="#EF4444" fill="#EF4444" />
+            </View>
                       )}
                     </View>
                     
@@ -524,11 +530,15 @@ const MealPlanCustomizationModal: React.FC<MealPlanCustomizationModalProps> = ({
                     
                     <View style={styles.recipeMeta}>
                       <View style={styles.recipeMetaItem}>
-                        <Clock size={14} color="#6B7280" />
+                        <View>
+              <Clock size={14} color="#6B7280" />
+            </View>
                         <Text style={styles.recipeMetaText}>{recipe.prepTime}m</Text>
                       </View>
                       <View style={styles.recipeMetaItem}>
-                        <Users size={14} color="#6B7280" />
+                        <View>
+              <Users size={14} color="#6B7280" />
+            </View>
                         <Text style={styles.recipeMetaText}>{recipe.servings}</Text>
                       </View>
                       <View style={[

@@ -112,15 +112,19 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <X size={24} color="#111827" />
+            <View>
+              <X size={24} color="#111827" />
+            </View>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Recipe Details</Text>
           <TouchableOpacity style={styles.favoriteButton}>
-            <Heart
-              size={24}
-              color={recipe.isFavorite ? '#EF4444' : '#6B7280'}
-              fill={recipe.isFavorite ? '#EF4444' : 'transparent'}
-            />
+            <View>
+              <Heart
+                size={24}
+                color={recipe.isFavorite ? '#EF4444' : '#6B7280'}
+                fill={recipe.isFavorite ? '#EF4444' : 'transparent'}
+              />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -164,11 +168,15 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             {/* Meta Info */}
             <View style={styles.metaContainer}>
               <View style={styles.metaItem}>
-                <Clock size={16} color="#6B7280" />
+                <View>
+                  <Clock size={16} color="#6B7280" />
+                </View>
                 <Text style={styles.metaText}>{recipe.prepTime} minutes</Text>
               </View>
               <View style={styles.metaItem}>
-                <Users size={16} color="#6B7280" />
+                <View>
+                  <Users size={16} color="#6B7280" />
+                </View>
                 <Text style={styles.metaText}>{recipe.servings} servings</Text>
               </View>
               <View style={[
@@ -185,11 +193,15 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                 style={styles.primaryButton}
                 onPress={() => setShowMealPlanOptions(true)}
               >
-                <Calendar size={20} color="#ffffff" />
+                <View>
+                  <Calendar size={20} color="#ffffff" />
+                </View>
                 <Text style={styles.primaryButtonText}>Add to Meal Plan</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.secondaryButton}>
-                <Plus size={20} color="#16A34A" />
+                <View>
+                  <Plus size={20} color="#16A34A" />
+                </View>
                 <Text style={styles.secondaryButtonText}>Add to Shopping List</Text>
               </TouchableOpacity>
             </View>

@@ -123,14 +123,18 @@ const ProfileScreen = () => {
               <TouchableOpacity key={index} style={styles.menuItem} onPress={item.action}>
                 <View style={styles.menuItemLeft}>
                   <View style={styles.menuIcon}>
-                    <IconComponent size={20} color="#16A34A" />
+                    <View>
+              <IconComponent size={20} color="#16A34A" />
+            </View>
                   </View>
                   <View style={styles.menuText}>
                     <Text style={styles.menuTitle}>{item.title}</Text>
                     <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color="#9CA3AF" />
+                <View>
+              <ChevronRight size={20} color="#9CA3AF" />
+            </View>
               </TouchableOpacity>
             );
           })}

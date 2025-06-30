@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets, User } from 'lucide-react-native';
+import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets, User, Edit3, Check, X } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
@@ -57,6 +58,8 @@ const HomeScreen = () => {
   const [bloodSugarModalVisible, setBloodSugarModalVisible] = useState(false);
   const [todaysCarbEntries, setTodaysCarbEntries] = useState<CarbEntry[]>([]);
   const [bloodSugarReadings, setBloodSugarReadings] = useState<BloodSugarReading[]>([]);
+  const [isEditingCarbs, setIsEditingCarbs] = useState(false);
+  const [editingCarbValue, setEditingCarbValue] = useState('');
 
   // User profile data
   const userProfile = {
@@ -66,11 +69,20 @@ const HomeScreen = () => {
 
   // Update current time every minute
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); // Update every minute
+    let timer: NodeJS.Timeout;
+    try {
+      timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 60000); // Update every minute
+    } catch (error) {
+      console.warn('Error setting up timer:', error);
+    }
 
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
   }, []);
 
   // Initialize with some sample carb entries
@@ -282,6 +294,59 @@ const HomeScreen = () => {
     router.push('/(tabs)/profile');
   };
 
+  const handleEditCarbs = () => {
+    setIsEditingCarbs(true);
+    setEditingCarbValue(todayStats.carbsConsumed.toString());
+  };
+
+  const handleSaveCarbs = () => {
+    const newValue = parseFloat(editingCarbValue);
+    if (!isNaN(newValue) && newValue >= 0) {
+      // Create a new entry to represent the manual adjustment
+      const manualEntry: CarbEntry = {
+        id: Date.now(),
+        name: 'Manual Adjustment',
+        carbs: newValue - todayStats.carbsConsumed,
+        time: new Date().toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        }),
+        mealType: 'Snack',
+        notes: 'Manual carb adjustment',
+      };
+      
+      if (newValue > todayStats.carbsConsumed) {
+        // Add the difference as a new entry
+        setTodaysCarbEntries(prev => [...prev, manualEntry]);
+      } else if (newValue < todayStats.carbsConsumed) {
+        // Remove entries to match the new total
+        const difference = todayStats.carbsConsumed - newValue;
+        let remainingToRemove = difference;
+        const updatedEntries = [...todaysCarbEntries];
+        
+        for (let i = updatedEntries.length - 1; i >= 0 && remainingToRemove > 0; i--) {
+          if (updatedEntries[i].carbs <= remainingToRemove) {
+            remainingToRemove -= updatedEntries[i].carbs;
+            updatedEntries.splice(i, 1);
+          } else {
+            updatedEntries[i].carbs -= remainingToRemove;
+            remainingToRemove = 0;
+          }
+        }
+        
+        setTodaysCarbEntries(updatedEntries);
+      }
+    }
+    setIsEditingCarbs(false);
+    setEditingCarbValue('');
+  };
+
+  const handleCancelEditCarbs = () => {
+    setIsEditingCarbs(false);
+    setEditingCarbValue('');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -298,7 +363,11 @@ const HomeScreen = () => {
               onPress={handleProfilePress}
               activeOpacity={0.7}
             >
-              <Image source={{ uri: userProfile.avatar }} style={styles.profileAvatar} />
+              <Image 
+                source={{ uri: userProfile.avatar }} 
+                style={styles.profileAvatar}
+                resizeMode="cover"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -307,25 +376,78 @@ const HomeScreen = () => {
         <View style={styles.carbProgressCard}>
           <View style={styles.carbProgressHeader}>
             <View style={styles.carbProgressTitleContainer}>
-              <Target size={24} color="#16A34A" />
+              <View>
+                <Target size={24} color="#16A34A" />
+              </View>
               <Text style={styles.carbProgressTitle}>Today's Carbs</Text>
             </View>
-            <TouchableOpacity 
-              style={styles.quickLogButton}
-              onPress={() => setCarbModalVisible(true)}
-            >
-              <Plus size={16} color="#ffffff" />
-              <Text style={styles.quickLogText}>Log</Text>
-            </TouchableOpacity>
+            <View style={styles.carbProgressActions}>
+              {isEditingCarbs ? (
+                <>
+                  <TouchableOpacity 
+                    style={styles.editActionButton}
+                    onPress={handleSaveCarbs}
+                  >
+                    <View>
+                      <Check size={16} color="#ffffff" />
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.editActionButton}
+                    onPress={handleCancelEditCarbs}
+                  >
+                    <View>
+                      <X size={16} color="#ffffff" />
+                    </View>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity 
+                    style={styles.editButton}
+                    onPress={handleEditCarbs}
+                  >
+                    <View>
+                      <Edit3 size={16} color="#16A34A" />
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.quickLogButton}
+                    onPress={() => setCarbModalVisible(true)}
+                  >
+                    <View>
+                      <Plus size={16} color="#ffffff" />
+                    </View>
+                    <Text style={styles.quickLogText}>Log</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           </View>
           
           <View style={styles.carbProgressMain}>
-            <Text style={styles.carbProgressValue}>
-              {todayStats.carbsConsumed}g
-            </Text>
-            <Text style={styles.carbProgressTarget}>
-              of {todayStats.carbsTarget}g
-            </Text>
+            {isEditingCarbs ? (
+              <View style={styles.carbEditContainer}>
+                <TextInput
+                  style={styles.carbEditInput}
+                  value={editingCarbValue}
+                  onChangeText={setEditingCarbValue}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Text style={styles.carbEditUnit}>g</Text>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.carbProgressValue}>
+                  {todayStats.carbsConsumed}g
+                </Text>
+                <Text style={styles.carbProgressTarget}>
+                  of {todayStats.carbsTarget}g
+                </Text>
+              </>
+            )}
           </View>
           
           <View style={styles.carbProgressBar}>
@@ -349,14 +471,18 @@ const HomeScreen = () => {
         <View style={styles.bloodSugarCard}>
           <View style={styles.bloodSugarHeader}>
             <View style={styles.bloodSugarTitleContainer}>
-              <Droplets size={24} color="#10B981" />
+              <View>
+                <Droplets size={24} color="#10B981" />
+              </View>
               <Text style={styles.bloodSugarTitle}>Blood Sugar</Text>
             </View>
             <TouchableOpacity 
               style={styles.bloodSugarLogButton}
               onPress={() => setBloodSugarModalVisible(true)}
             >
-              <Plus size={16} color="#ffffff" />
+              <View>
+                <Plus size={16} color="#ffffff" />
+              </View>
               <Text style={styles.bloodSugarLogText}>Log</Text>
             </TouchableOpacity>
           </View>
@@ -394,21 +520,27 @@ const HomeScreen = () => {
           <Text style={styles.cardTitle}>Quick Actions</Text>
           <View style={styles.quickActions}>
             <TouchableOpacity style={styles.actionButton}>
-              <Calendar size={24} color="#16A34A" />
+              <View>
+                <Calendar size={24} color="#16A34A" />
+              </View>
               <Text style={styles.actionText}>Plan This Week</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButton}
               onPress={() => setCarbModalVisible(true)}
             >
-              <Target size={24} color="#16A34A" />
+              <View>
+                <Target size={24} color="#16A34A" />
+              </View>
               <Text style={styles.actionText}>Log Carbs</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButton}
               onPress={() => setBloodSugarModalVisible(true)}
             >
-              <Droplets size={24} color="#16A34A" />
+              <View>
+                <Droplets size={24} color="#16A34A" />
+              </View>
               <Text style={styles.actionText}>Log Blood Sugar</Text>
             </TouchableOpacity>
           </View>
@@ -431,7 +563,11 @@ const HomeScreen = () => {
                 onPress={() => handleRecipePress(recipe)}
                 activeOpacity={0.7}
               >
-                <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+                <Image 
+                  source={{ uri: recipe.image }} 
+                  style={styles.recipeImage}
+                  resizeMode="cover"
+                />
                 <View style={styles.recipeInfo}>
                   <Text style={styles.recipeName}>{recipe.name}</Text>
                   <View style={styles.recipeStats}>
@@ -447,7 +583,9 @@ const HomeScreen = () => {
                       <Text style={styles.recipeStatLabel}>{recipe.glycemicIndex} GI</Text>
                     </View>
                     <View style={styles.recipeStat}>
-                      <Clock size={12} color="#6B7280" />
+                      <View>
+                        <Clock size={12} color="#6B7280" />
+                      </View>
                       <Text style={styles.recipeStatLabel}>{recipe.prepTime}m</Text>
                     </View>
                   </View>
@@ -606,6 +744,42 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
     textAlign: 'center',
+  },
+  carbProgressActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  editButton: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#F0FDF4',
+  },
+  editActionButton: {
+    backgroundColor: '#16A34A',
+    borderRadius: 6,
+    padding: 8,
+  },
+  carbEditContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+  },
+  carbEditInput: {
+    fontSize: 36,
+    fontFamily: 'Inter-Bold',
+    color: '#111827',
+    textAlign: 'center',
+    minWidth: 80,
+    paddingHorizontal: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: '#16A34A',
+  },
+  carbEditUnit: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    marginLeft: 4,
   },
   bloodSugarCard: {
     backgroundColor: '#ffffff',

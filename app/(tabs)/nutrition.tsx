@@ -26,7 +26,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Droplets,
-  Edit3
+  Edit3,
+  Trash2
 } from 'lucide-react-native';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import CustomMealModal from '../../components/CustomMealModal';
@@ -78,6 +79,7 @@ const NutritionScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMealType, setSelectedMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
   const [customServing, setCustomServing] = useState('1');
+  const [customMealType, setCustomMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
 
   // User's daily targets
   const dailyTargets = {
@@ -297,16 +299,21 @@ const NutritionScreen = () => {
         minute: '2-digit',
         hour12: true 
       }),
-      mealType: selectedMealType,
+      mealType: customMealType,
     };
 
-    setDailyEntries([...dailyEntries, newEntry]);
+    setDailyEntries(prev => [...prev, newEntry]);
     setCustomMealModalVisible(false);
     Alert.alert(
       'Custom Meal Added!',
-      `${customMeal.name} has been added to your ${selectedMealType.toLowerCase()}`,
+      `${customMeal.name} has been added to your ${customMealType.toLowerCase()}`,
       [{ text: 'OK' }]
     );
+  };
+
+  const handleOpenCustomMealModal = (mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack') => {
+    setCustomMealType(mealType);
+    setCustomMealModalVisible(true);
   };
 
   const navigateDate = (direction: number) => {
@@ -369,7 +376,9 @@ const NutritionScreen = () => {
             style={styles.dateNavButton} 
             onPress={() => navigateDate(-1)}
           >
-            <ChevronLeft size={20} color="#16A34A" />
+            <View>
+              <ChevronLeft size={20} color="#16A34A" />
+            </View>
           </TouchableOpacity>
           
           <View style={styles.dateInfo}>
@@ -387,7 +396,9 @@ const NutritionScreen = () => {
             style={styles.dateNavButton} 
             onPress={() => navigateDate(1)}
           >
-            <ChevronRight size={20} color="#16A34A" />
+            <View>
+              <ChevronRight size={20} color="#16A34A" />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -399,7 +410,9 @@ const NutritionScreen = () => {
           <View style={styles.primaryProgress}>
             <View style={styles.progressHeader}>
               <View style={styles.progressLabelContainer}>
-                <Target size={20} color="#16A34A" />
+                <View>
+              <Target size={20} color="#16A34A" />
+            </View>
                 <Text style={styles.primaryProgressLabel}>Carbohydrates</Text>
               </View>
               <Text style={styles.primaryProgressValue}>
@@ -426,7 +439,9 @@ const NutritionScreen = () => {
           <View style={styles.secondaryProgressGrid}>
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
-                <Zap size={16} color="#F59E0B" />
+                <View>
+              <Zap size={16} color="#F59E0B" />
+            </View>
                 <Text style={styles.secondaryProgressLabel}>Protein</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -439,7 +454,9 @@ const NutritionScreen = () => {
 
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
-                <Activity size={16} color="#EF4444" />
+                <View>
+              <Activity size={16} color="#EF4444" />
+            </View>
                 <Text style={styles.secondaryProgressLabel}>Calories</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -452,7 +469,9 @@ const NutritionScreen = () => {
 
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
-                <Heart size={16} color="#10B981" />
+                <View>
+              <Heart size={16} color="#10B981" />
+            </View>
                 <Text style={styles.secondaryProgressLabel}>Fiber</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -469,14 +488,18 @@ const NutritionScreen = () => {
         <View style={styles.bloodSugarCard}>
           <View style={styles.bloodSugarHeader}>
             <View style={styles.bloodSugarTitleContainer}>
+              <View>
               <Droplets size={20} color="#10B981" />
+            </View>
               <Text style={styles.bloodSugarTitle}>Blood Sugar</Text>
             </View>
             <TouchableOpacity 
               style={styles.bloodSugarLogButton}
               onPress={() => setBloodSugarModalVisible(true)}
             >
+              <View>
               <Plus size={16} color="#ffffff" />
+            </View>
               <Text style={styles.bloodSugarLogText}>Log</Text>
             </TouchableOpacity>
           </View>
@@ -533,15 +556,19 @@ const NutritionScreen = () => {
               style={styles.quickAddButton}
               onPress={() => setAddModalVisible(true)}
             >
+              <View>
               <Search size={20} color="#ffffff" />
+            </View>
               <Text style={styles.quickAddText}>Search Foods</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={[styles.quickAddButton, styles.customMealButton]}
-              onPress={() => setCustomMealModalVisible(true)}
+              onPress={() => handleOpenCustomMealModal('Breakfast')}
             >
-              <Edit3 size={20} color="#ffffff" />
+              <View>
+                <Edit3 size={20} color="#ffffff" />
+              </View>
               <Text style={styles.quickAddText}>Custom Meal</Text>
             </TouchableOpacity>
           </View>
@@ -569,60 +596,97 @@ const NutritionScreen = () => {
               </View>
 
               {mealEntries.length === 0 ? (
-                <TouchableOpacity 
-                  style={styles.emptyMealCard}
-                  onPress={() => {
-                    setSelectedMealType(mealType as any);
-                    setAddModalVisible(true);
-                  }}
-                >
-                  <Plus size={24} color="#9CA3AF" />
-                  <Text style={styles.emptyMealText}>Add {mealType.toLowerCase()}</Text>
-                </TouchableOpacity>
-              ) : (
-                <View style={styles.mealEntries}>
-                  {mealEntries.map((entry) => (
-                    <TouchableOpacity 
-                      key={entry.id} 
-                      style={styles.entryCard}
-                      onLongPress={() => removeEntry(entry.id)}
-                    >
-                      <View style={styles.entryHeader}>
-                        <Text style={styles.entryName}>{entry.name}</Text>
-                        <Text style={styles.entryTime}>{entry.time}</Text>
-                      </View>
-                      <Text style={styles.entryServing}>{entry.serving}</Text>
-                      <View style={styles.entryNutrients}>
-                        <View style={styles.nutrientItem}>
-                          <Text style={styles.nutrientValue}>{entry.carbs}g</Text>
-                          <Text style={styles.nutrientLabel}>carbs</Text>
-                        </View>
-                        <View style={styles.nutrientItem}>
-                          <Text style={styles.nutrientValue}>{entry.protein}g</Text>
-                          <Text style={styles.nutrientLabel}>protein</Text>
-                        </View>
-                        <View style={styles.nutrientItem}>
-                          <Text style={styles.nutrientValue}>{entry.calories}</Text>
-                          <Text style={styles.nutrientLabel}>cal</Text>
-                        </View>
-                        <View style={styles.nutrientItem}>
-                          <Text style={styles.nutrientValue}>{entry.fiber}g</Text>
-                          <Text style={styles.nutrientLabel}>fiber</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                  
+                <View style={styles.emptyMealActions}>
                   <TouchableOpacity 
-                    style={styles.addMoreButton}
+                    style={styles.emptyMealCard}
                     onPress={() => {
                       setSelectedMealType(mealType as any);
                       setAddModalVisible(true);
                     }}
                   >
-                    <Plus size={16} color="#16A34A" />
-                    <Text style={styles.addMoreText}>Add more to {mealType.toLowerCase()}</Text>
+                    <View>
+                      <Plus size={24} color="#9CA3AF" />
+                    </View>
+                    <Text style={styles.emptyMealText}>Add {mealType.toLowerCase()}</Text>
                   </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.emptyMealCard, styles.customMealCard]}
+                    onPress={() => handleOpenCustomMealModal(mealType as any)}
+                  >
+                    <View>
+                      <Edit3 size={24} color="#16A34A" />
+                    </View>
+                    <Text style={[styles.emptyMealText, styles.customMealText]}>Custom {mealType.toLowerCase()}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.mealEntries}>
+                  {mealEntries.map((entry) => (
+                    <View key={entry.id} style={styles.entryCard}>
+                      <TouchableOpacity 
+                        style={styles.entryContent}
+                        onLongPress={() => removeEntry(entry.id)}
+                      >
+                        <View style={styles.entryHeader}>
+                          <Text style={styles.entryName}>{entry.name}</Text>
+                          <Text style={styles.entryTime}>{entry.time}</Text>
+                        </View>
+                        <Text style={styles.entryServing}>{entry.serving}</Text>
+                        <View style={styles.entryNutrients}>
+                          <View style={styles.nutrientItem}>
+                            <Text style={styles.nutrientValue}>{entry.carbs}g</Text>
+                            <Text style={styles.nutrientLabel}>carbs</Text>
+                          </View>
+                          <View style={styles.nutrientItem}>
+                            <Text style={styles.nutrientValue}>{entry.protein}g</Text>
+                            <Text style={styles.nutrientLabel}>protein</Text>
+                          </View>
+                          <View style={styles.nutrientItem}>
+                            <Text style={styles.nutrientValue}>{entry.calories}</Text>
+                            <Text style={styles.nutrientLabel}>cal</Text>
+                          </View>
+                          <View style={styles.nutrientItem}>
+                            <Text style={styles.nutrientValue}>{entry.fiber}g</Text>
+                            <Text style={styles.nutrientLabel}>fiber</Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.deleteButton}
+                        onPress={() => removeEntry(entry.id)}
+                      >
+                        <View>
+                          <Trash2 size={16} color="#EF4444" />
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                  
+                  <View style={styles.addMoreActions}>
+                    <TouchableOpacity 
+                      style={styles.addMoreButton}
+                      onPress={() => {
+                        setSelectedMealType(mealType as any);
+                        setAddModalVisible(true);
+                      }}
+                    >
+                      <View>
+                        <Plus size={16} color="#16A34A" />
+                      </View>
+                      <Text style={styles.addMoreText}>Add more to {mealType.toLowerCase()}</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={[styles.addMoreButton, styles.customMealAddButton]}
+                      onPress={() => handleOpenCustomMealModal(mealType as any)}
+                    >
+                      <View>
+                        <Edit3 size={16} color="#16A34A" />
+                      </View>
+                      <Text style={styles.addMoreText}>Custom {mealType.toLowerCase()}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             </View>
@@ -667,7 +731,9 @@ const NutritionScreen = () => {
               style={styles.modalCloseButton}
               onPress={() => setAddModalVisible(false)}
             >
+              <View>
               <X size={24} color="#111827" />
+            </View>
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Add Food</Text>
             <View style={styles.modalHeaderSpacer} />
@@ -699,7 +765,9 @@ const NutritionScreen = () => {
 
           {/* Search */}
           <View style={styles.searchContainer}>
-            <Search size={20} color="#6B7280" />
+            <View>
+              <Search size={20} color="#6B7280" />
+            </View>
             <TextInput
               style={styles.searchInput}
               placeholder="Search foods..."
@@ -776,7 +844,7 @@ const NutritionScreen = () => {
         visible={customMealModalVisible}
         onClose={() => setCustomMealModalVisible(false)}
         onSave={handleCustomMealSave}
-        mealType={selectedMealType}
+        mealType={customMealType}
       />
     </SafeAreaView>
   );
@@ -1135,6 +1203,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  entryContent: {
+    flex: 1,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
+    borderRadius: 8,
+    backgroundColor: '#FEF2F2',
   },
   entryHeader: {
     flexDirection: 'row',
@@ -1396,6 +1475,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
     marginTop: 2,
+  },
+  emptyMealActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  customMealCard: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#16A34A',
+    borderWidth: 1,
+  },
+  customMealText: {
+    color: '#16A34A',
+  },
+  addMoreActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  customMealAddButton: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#16A34A',
+    borderWidth: 1,
   },
 });
 

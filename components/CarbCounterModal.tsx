@@ -119,7 +119,9 @@ const CarbCounterModal: React.FC<CarbCounterModalProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <X size={24} color="#111827" />
+            <View>
+              <X size={24} color="#111827" />
+            </View>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Log Carbs</Text>
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -134,7 +136,9 @@ const CarbCounterModal: React.FC<CarbCounterModalProps> = ({
               style={[styles.toggleButton, !quickAddMode && styles.toggleButtonActive]}
               onPress={() => setQuickAddMode(false)}
             >
-              <Calculator size={20} color={!quickAddMode ? '#ffffff' : '#16A34A'} />
+              <View>
+                <Calculator size={20} color={!quickAddMode ? '#ffffff' : '#16A34A'} />
+              </View>
               <Text style={[
                 styles.toggleButtonText,
                 !quickAddMode && styles.toggleButtonTextActive
@@ -146,7 +150,9 @@ const CarbCounterModal: React.FC<CarbCounterModalProps> = ({
               style={[styles.toggleButton, quickAddMode && styles.toggleButtonActive]}
               onPress={() => setQuickAddMode(true)}
             >
-              <Target size={20} color={quickAddMode ? '#ffffff' : '#16A34A'} />
+              <View>
+                <Target size={20} color={quickAddMode ? '#ffffff' : '#16A34A'} />
+              </View>
               <Text style={[
                 styles.toggleButtonText,
                 quickAddMode && styles.toggleButtonTextActive

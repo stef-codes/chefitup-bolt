@@ -49,6 +49,7 @@
     "@babel/core": "^7.25.2",
     "@react-native-community/cli": "^13.6.8",
     "@types/react": "~19.0.10",
+    "babel-plugin-inline-dotenv": "^1.7.0",
     "typescript": "~5.8.3"
   }
 }

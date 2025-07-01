@@ -8,10 +8,13 @@ import {
   TextInput,
   Alert,
   Image,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar, ExternalLink } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+import { showToast } from '../../utils/toast';
 
 type ShoppingListItem = {
   id: number;
@@ -292,40 +295,81 @@ const ShoppingScreen = () => {
     return shoppingList.filter(item => item.fromMealPlan).length;
   };
 
-  const sendToInstacart = () => {
+  const sendToInstacart = async () => {
     if (shoppingList.length === 0) {
-      Alert.alert('Empty List', 'Please add items to your shopping list first.');
+      showToast({ message: 'Please add items to your shopping list first.', backgroundColor: '#EF4444' });
       return;
     }
 
-    // Format the shopping list for Instacart
-    const formattedList = shoppingList
-      .map(item => `${item.quantity} ${item.name}`)
-      .join('\n');
+    const apiKey = process.env.INSTACART_API_KEY;
+    if (!apiKey) {
+      showToast({ message: 'Instacart API key not found.', backgroundColor: '#EF4444' });
+      return;
+    }
 
-    // Create the Instacart URL with the shopping list
-    const instacartUrl = `https://www.instacart.com/store/start?items=${encodeURIComponent(formattedList)}`;
-    
-    // Try to open Instacart app first, then fallback to website
-    Alert.alert(
-      'Send to Instacart',
-      'Would you like to send your shopping list to Instacart?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Send to Instacart', 
-          onPress: () => {
-            // In a real app, you would use Linking.openURL(instacartUrl)
-            // For now, we'll show a success message
-            Alert.alert(
-              'Success!',
-              'Your shopping list has been sent to Instacart. You can now add these items to your cart.',
-              [{ text: 'OK' }]
-            );
-          }
+    // Build Instacart API payload
+    const payload = {
+      title: 'ChefItUp Shopping List',
+      image_url: '',
+      link_type: 'shopping_list',
+      expires_in: 1,
+      instructions: ['Review and add these items to your Instacart cart.'],
+      line_items: shoppingList.map(item => ({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: '',
+        display_text: `${item.quantity} ${item.name}`,
+        line_item_measurements: [
+          {
+            quantity: parseFloat(item.quantity) || 1,
+            unit: '',
+          },
+        ],
+        filters: {
+          brand_filters: [],
+          health_filters: [],
         },
-      ]
-    );
+      })),
+      landing_page_configuration: {
+        partner_linkback_url: '',
+        enable_pantry_items: true,
+      },
+    };
+
+    try {
+      const response = await fetch('https://connect.dev.instacart.tools/idp/v1/products/products_link', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        showToast({ message: 'Shopping list sent to Instacart!', backgroundColor: '#16A34A' });
+        console.log('Instacart API response:', data);
+        
+        // Check for the correct field name in the response
+        const instacartUrl = data?.products_link_url || data?.url;
+        
+        if (instacartUrl) {
+          // Open the Instacart link directly
+          Linking.openURL(instacartUrl).catch(err => {
+            showToast({ message: 'Could not open Instacart link.', backgroundColor: '#EF4444' });
+            console.error('Linking error:', err);
+          });
+        } else {
+          showToast({ message: 'No Instacart link returned.', backgroundColor: '#EF4444' });
+          console.error('No Instacart link in response:', data);
+        }
+      } else {
+        showToast({ message: data?.message || 'Failed to send to Instacart.', backgroundColor: '#EF4444' });
+      }
+    } catch (error) {
+      showToast({ message: 'Error sending to Instacart.', backgroundColor: '#EF4444' });
+    }
   };
 
   // Add userProfile and handleProfilePress

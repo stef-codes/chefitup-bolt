@@ -69,7 +69,7 @@ const HomeScreen = () => {
 
   // Update current time every minute
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setInterval>;
     try {
       timer = setInterval(() => {
         setCurrentTime(new Date());
@@ -349,7 +349,11 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingBottom: 128 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header with Profile Icon */}
         <View style={styles.headerContainer}>
           <View style={styles.header}>

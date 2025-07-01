@@ -9,6 +9,7 @@ import {
   Modal,
   Alert,
   StyleSheet,
+  Image,
 } from 'react-native';
 import {
   ChevronLeft,
@@ -26,6 +27,7 @@ import {
 } from 'lucide-react-native';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import CustomMealModal from '../../components/CustomMealModal';
+import { useRouter } from 'expo-router';
 
 interface NutritionEntry {
   id: number;
@@ -275,13 +277,40 @@ const NutritionScreen = () => {
     ? todaysBloodSugarReadings[todaysBloodSugarReadings.length - 1] 
     : null;
 
+  const router = useRouter();
+
+  const userProfile = {
+    name: 'Sarah Johnson',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+  };
+
+  const handleProfilePress = () => {
+    // @ts-ignore
+    if (typeof router !== 'undefined') {
+      router.push('/(tabs)/profile');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Nutrition Tracker</Text>
-          <Text style={styles.subtitle}>Monitor your daily carbs and nutrients</Text>
+        <View style={[styles.header, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}> 
+          <View>
+            <Text style={styles.title}>Nutrition</Text>
+            {/* Add any subtitle if needed */}
+          </View>
+          <TouchableOpacity 
+            style={styles.profileIcon}
+            onPress={handleProfilePress}
+            activeOpacity={0.7}
+          >
+            <Image 
+              source={{ uri: userProfile.avatar }} 
+              style={styles.profileAvatar}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
         </View>
         {/* Date Navigation */}
         <View style={styles.dateNavigation}>
@@ -1336,6 +1365,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0FDF4',
     borderColor: '#16A34A',
     borderWidth: 1,
+  },
+  profileIcon: {
+    backgroundColor: '#ffffff',
+    borderRadius: 28,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    transform: [{ scale: 1 }],
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
 });
 

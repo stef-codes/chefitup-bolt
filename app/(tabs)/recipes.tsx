@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Filter, Clock, Users, Heart } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
+import { useRouter } from 'expo-router';
 
 interface Recipe {
   id: number;
@@ -33,6 +34,7 @@ const RecipesScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const router = useRouter();
 
   const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Low-Carb', 'High-Protein'];
 
@@ -800,19 +802,42 @@ const RecipesScreen = () => {
     );
   };
 
+  const userProfile = {
+    name: 'Sarah Johnson',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+  };
+  const handleProfilePress = () => {
+    // @ts-ignore
+    if (typeof router !== 'undefined') {
+      router.push('/(tabs)/profile');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Recipes</Text>
-        <Text style={styles.subtitle}>Diabetes-friendly meal options</Text>
+      <View style={[styles.header, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+        <View>
+          <Text style={styles.title}>Recipes</Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.profileIcon}
+          onPress={handleProfilePress}
+          activeOpacity={0.7}
+        >
+          <Image 
+            source={{ uri: userProfile.avatar }} 
+            style={styles.profileAvatar}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-                      <View>
-              <Search size={20} color="#6B7280" />
-            </View>
+          <View>
+            <Search size={20} color="#6B7280" />
+          </View>
           <TextInput
             style={styles.searchInput}
             placeholder="Search recipes..."
@@ -821,9 +846,9 @@ const RecipesScreen = () => {
           />
         </View>
         <TouchableOpacity style={styles.filterButton}>
-                      <View>
-              <Filter size={20} color="#16A34A" />
-            </View>
+          <View>
+            <Filter size={20} color="#16A34A" />
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -906,8 +931,8 @@ const RecipesScreen = () => {
                   <View style={styles.metaRow}>
                     <View style={styles.metaItem}>
                       <View>
-              <Clock size={14} color="#6B7280" />
-            </View>
+                        <Clock size={14} color="#6B7280" />
+                      </View>
                       <Text style={styles.metaText}>{recipe.prepTime}m</Text>
                     </View>
                     <View style={[
@@ -918,8 +943,8 @@ const RecipesScreen = () => {
                     </View>
                     <View style={styles.metaItem}>
                       <View>
-              <Users size={14} color="#6B7280" />
-            </View>
+                        <Users size={14} color="#6B7280" />
+                      </View>
                       <Text style={styles.metaText}>{recipe.servings}</Text>
                     </View>
                   </View>
@@ -1134,6 +1159,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
+  },
+  profileIcon: {
+    backgroundColor: '#ffffff',
+    borderRadius: 28,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    transform: [{ scale: 1 }],
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
 });
 

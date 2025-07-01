@@ -34,6 +34,15 @@ interface MealPlan {
   };
 }
 
+const userProfile = {
+  name: 'Sarah Johnson',
+  avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+};
+
+const handleProfilePress = () => {
+  router.push('/(tabs)/profile');
+};
+
 const MealPlanScreen = () => {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedDay, setSelectedDay] = useState(0);
@@ -603,11 +612,28 @@ const MealPlanScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingBottom: 8 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Meal Plan</Text>
-          <Text style={styles.subtitle}>Your weekly diabetes-friendly menu</Text>
+        <View style={[styles.header, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}> 
+          <View>
+            <Text style={styles.title}>Meal Plan</Text>
+            <Text style={styles.subtitle}>Your weekly diabetes-friendly menu</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.profileIcon}
+            onPress={handleProfilePress}
+            activeOpacity={0.7}
+          >
+            <Image 
+              source={{ uri: userProfile.avatar }} 
+              style={styles.profileAvatar}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Week Navigation */}
@@ -620,11 +646,11 @@ const MealPlanScreen = () => {
               <ChevronLeft size={20} color="#16A34A" />
             </View>
           </TouchableOpacity>
-          
+        
           <Text style={styles.weekTitle}>
             {getWeekTitle()}
           </Text>
-          
+  
           <TouchableOpacity 
             style={styles.navButton} 
             onPress={() => navigateWeek(1)}
@@ -1305,6 +1331,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
+  },
+  profileIcon: {
+    backgroundColor: '#ffffff',
+    borderRadius: 28,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    transform: [{ scale: 1 }],
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
 });
 

@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar, ExternalLink } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 type ShoppingListItem = {
   id: number;
@@ -24,6 +26,7 @@ const ShoppingScreen = () => {
   const [newItem, setNewItem] = useState('');
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const router = useRouter();
 
   // Meal plan data (in a real app, this would come from a shared state/context)
   const currentWeekMealPlan = {
@@ -325,17 +328,38 @@ const ShoppingScreen = () => {
     );
   };
 
+  // Add userProfile and handleProfilePress
+  const userProfile = {
+    name: 'Sarah Johnson',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+  };
+  const handleProfilePress = () => {
+    // @ts-ignore
+    if (typeof router !== 'undefined') {
+      router.push('/(tabs)/profile');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.mainScrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Shopping List</Text>
-          <Text style={styles.subtitle}>
-            {getMealPlanItemsCount() > 0 
-              ? `${getMealPlanItemsCount()} items from meal plan`
-              : 'Add items or generate from meal plan'
-            }
-          </Text>
+        {/* Header */}
+        <View style={[styles.header, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}> 
+          <View>
+            <Text style={styles.title}>Shopping List</Text>
+            {/* Add any subtitle if needed */}
+          </View>
+          <TouchableOpacity 
+            style={styles.profileIcon}
+            onPress={handleProfilePress}
+            activeOpacity={0.7}
+          >
+            <Image 
+              source={{ uri: userProfile.avatar }} 
+              style={styles.profileAvatar}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Shopping Summary */}
@@ -843,6 +867,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
+  },
+  profileIcon: {
+    backgroundColor: '#ffffff',
+    borderRadius: 28,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    transform: [{ scale: 1 }],
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
 });
 

@@ -4,6 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, Text } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Chrome, Home, Calendar, ShoppingCart, Target } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,6 +52,7 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />
+      <Toast />
     </View>
   );
 }

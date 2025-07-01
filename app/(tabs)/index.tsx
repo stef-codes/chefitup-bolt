@@ -15,6 +15,7 @@ import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets, User, Ed
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
+import { showToast } from '../toast';
 
 interface Recipe {
   id: number;
@@ -261,11 +262,10 @@ const HomeScreen = () => {
   };
 
   const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
-    Alert.alert(
-      'Added to Meal Plan!',
-      `${recipe.name} has been added to ${day} ${mealType}`,
-      [{ text: 'OK' }]
-    );
+    showToast({
+      message: `Added to Meal Plan\n${recipe.name} has been added to your meal plan for ${mealType} on ${day}.`,
+      backgroundColor: '#16A34A',
+    });
   };
 
   const handleCarbEntrySave = (entry: CarbEntry) => {

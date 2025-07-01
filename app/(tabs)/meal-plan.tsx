@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
+import { showToast } from '../toast';
 
 interface Recipe {
   id: number;
@@ -579,26 +580,17 @@ const MealPlanScreen = () => {
       },
     }));
     
-    Alert.alert(
-      'Recipe Updated!',
-      `${recipe.name} has been added to ${day} ${mealType}`,
-      [{ text: 'OK' }]
-    );
+    showToast({
+      message: `Recipe Updated!\n${recipe.name} has been added to ${day} ${mealType}`,
+      backgroundColor: '#16A34A',
+    });
   };
 
   const generateRandomMealPlan = () => {
-    // This would typically call an API to generate a new meal plan
-    Alert.alert(
-      'Generate New Meal Plan',
-      'This will create a new diabetes-friendly meal plan for the week.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Generate', onPress: () => {
-          // Simulate API call
-          Alert.alert('Success', 'New meal plan generated!');
-        }},
-      ]
-    );
+    showToast({
+      message: 'Generate New Meal Plan\nThis will create a new diabetes-friendly meal plan for the week.',
+      backgroundColor: '#10B981',
+    });
   };
 
   const handleGenerateShoppingList = () => {

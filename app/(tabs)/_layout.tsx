@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { Chrome as Home, Calendar, ShoppingCart, Target } from 'lucide-react-native';
+import { Chrome, Home, Calendar, ShoppingCart, Target } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (

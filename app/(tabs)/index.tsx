@@ -15,7 +15,7 @@ import { Clock, TrendingUp, Calendar, Target, Plus, Activity, Droplets, User, Ed
 import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
-import { showToast } from '../toast';
+import { showToast } from '../../utils/toast';
 
 interface Recipe {
   id: number;
@@ -351,7 +351,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={{ paddingBottom: 128 }}
+        contentContainerStyle={{ paddingBottom: 1 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header with Profile Icon */}

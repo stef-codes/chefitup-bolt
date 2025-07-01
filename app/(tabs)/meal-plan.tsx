@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
-import { showToast } from '../toast';
+import { showToast } from '../../utils/toast';
 
 interface Recipe {
   id: number;

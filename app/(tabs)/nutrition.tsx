@@ -549,30 +549,7 @@ const NutritionScreen = () => {
           )}
         </View>
 
-        {/* Quick Add Buttons */}
-        <View style={styles.quickAddContainer}>
-          <View style={styles.quickAddRow}>
-            <TouchableOpacity 
-              style={styles.quickAddButton}
-              onPress={() => setAddModalVisible(true)}
-            >
-              <View>
-              <Search size={20} color="#ffffff" />
-            </View>
-              <Text style={styles.quickAddText}>Search Foods</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.quickAddButton, styles.customMealButton]}
-              onPress={() => handleOpenCustomMealModal('Breakfast')}
-            >
-              <View>
-                <Edit3 size={20} color="#ffffff" />
-              </View>
-              <Text style={styles.quickAddText}>Custom Meal</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+
 
         {/* Meals by Type */}
         {mealTypes.map((mealType) => {
@@ -1116,38 +1093,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
   },
-  quickAddContainer: {
-    marginBottom: 24,
-  },
-  quickAddRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-  quickAddButton: {
-    backgroundColor: '#16A34A',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  quickAddText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#ffffff',
-    marginLeft: 8,
-  },
-  customMealButton: {
-    backgroundColor: '#10B981',
-  },
+
   mealSection: {
     marginBottom: 24,
   },

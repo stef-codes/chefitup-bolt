@@ -1,38 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  ScrollView,
+  SafeAreaView,
   TouchableOpacity,
+  ScrollView,
   TextInput,
   Modal,
   Alert,
-  Dimensions,
+  StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Plus, 
-  Target, 
-  TrendingUp, 
-  Clock, 
-  Search, 
-  X, 
-  Check,
-  Calendar,
-  Activity,
-  Zap,
-  Heart,
+import {
   ChevronLeft,
   ChevronRight,
+  Target,
+  Zap,
+  Activity,
+  Heart,
   Droplets,
+  Plus,
+  X,
+  Search,
   Edit3,
-  Trash2
+  Trash2,
 } from 'lucide-react-native';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import CustomMealModal from '../../components/CustomMealModal';
-
-const { width } = Dimensions.get('window');
 
 interface NutritionEntry {
   id: number;
@@ -76,147 +69,57 @@ const NutritionScreen = () => {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [bloodSugarModalVisible, setBloodSugarModalVisible] = useState(false);
   const [customMealModalVisible, setCustomMealModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedMealType, setSelectedMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
+  const [searchQuery, setSearchQuery] = useState('');
   const [customServing, setCustomServing] = useState('1');
   const [customMealType, setCustomMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
-  const [isReady, setIsReady] = useState(false);
 
   // User's daily targets
   const dailyTargets = {
     carbs: 150,
-    protein: 120,
-    calories: 1800,
+    protein: 80,
+    calories: 2000,
     fats: 65,
   };
 
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+
   // Sample food database
   const foodDatabase: FoodItem[] = [
-    // Fruits
     { id: 1, name: 'Apple (medium)', carbs: 25, protein: 0.5, calories: 95, fats: 0.3, sugar: 19, servingSize: '1 medium', category: 'Fruits' },
     { id: 2, name: 'Banana (medium)', carbs: 27, protein: 1.3, calories: 105, fats: 0.4, sugar: 14, servingSize: '1 medium', category: 'Fruits' },
     { id: 3, name: 'Orange (medium)', carbs: 15, protein: 1.2, calories: 62, fats: 0.2, sugar: 12, servingSize: '1 medium', category: 'Fruits' },
     { id: 4, name: 'Blueberries', carbs: 21, protein: 1.1, calories: 84, fats: 0.5, sugar: 15, servingSize: '1 cup', category: 'Fruits' },
     { id: 5, name: 'Strawberries', carbs: 11, protein: 1, calories: 49, fats: 0.5, sugar: 7, servingSize: '1 cup', category: 'Fruits' },
-    
-    // Vegetables
     { id: 6, name: 'Broccoli (cooked)', carbs: 11, protein: 4, calories: 55, fats: 0.6, sugar: 2, servingSize: '1 cup', category: 'Vegetables' },
     { id: 7, name: 'Spinach (raw)', carbs: 1, protein: 1, calories: 7, fats: 0.1, sugar: 0, servingSize: '1 cup', category: 'Vegetables' },
     { id: 8, name: 'Sweet Potato (baked)', carbs: 27, protein: 2, calories: 112, fats: 0.2, sugar: 5, servingSize: '1 medium', category: 'Vegetables' },
     { id: 9, name: 'Carrots (raw)', carbs: 12, protein: 1, calories: 50, fats: 0.3, sugar: 6, servingSize: '1 cup', category: 'Vegetables' },
     { id: 10, name: 'Bell Pepper (red)', carbs: 7, protein: 1, calories: 31, fats: 0.3, sugar: 5, servingSize: '1 cup', category: 'Vegetables' },
-    
-    // Grains
     { id: 11, name: 'Brown Rice (cooked)', carbs: 45, protein: 5, calories: 216, fats: 1.8, sugar: 1, servingSize: '1 cup', category: 'Grains' },
     { id: 12, name: 'Quinoa (cooked)', carbs: 39, protein: 8, calories: 222, fats: 3.6, sugar: 2, servingSize: '1 cup', category: 'Grains' },
     { id: 13, name: 'Oatmeal (cooked)', carbs: 28, protein: 6, calories: 154, fats: 2.6, sugar: 1, servingSize: '1 cup', category: 'Grains' },
     { id: 14, name: 'Whole Wheat Bread', carbs: 14, protein: 4, calories: 81, fats: 1.1, sugar: 1, servingSize: '1 slice', category: 'Grains' },
-    
-    // Proteins
     { id: 15, name: 'Chicken Breast (grilled)', carbs: 0, protein: 31, calories: 165, fats: 3.6, sugar: 0, servingSize: '100g', category: 'Proteins' },
     { id: 16, name: 'Salmon (grilled)', carbs: 0, protein: 25, calories: 206, fats: 12, sugar: 0, servingSize: '100g', category: 'Proteins' },
     { id: 17, name: 'Greek Yogurt (plain)', carbs: 9, protein: 20, calories: 130, fats: 0.5, sugar: 9, servingSize: '1 cup', category: 'Proteins' },
     { id: 18, name: 'Eggs (large)', carbs: 1, protein: 6, calories: 70, fats: 5, sugar: 1, servingSize: '1 egg', category: 'Proteins' },
     { id: 19, name: 'Tofu (firm)', carbs: 3, protein: 20, calories: 181, fats: 11, sugar: 1, servingSize: '100g', category: 'Proteins' },
-    
-    // Dairy
     { id: 20, name: 'Milk (2%)', carbs: 12, protein: 8, calories: 122, fats: 5, sugar: 12, servingSize: '1 cup', category: 'Dairy' },
     { id: 21, name: 'Cheddar Cheese', carbs: 1, protein: 7, calories: 113, fats: 9, sugar: 0, servingSize: '1 oz', category: 'Dairy' },
-    
-    // Nuts & Seeds
     { id: 22, name: 'Almonds', carbs: 6, protein: 6, calories: 164, fats: 14, sugar: 1, servingSize: '1 oz', category: 'Nuts & Seeds' },
     { id: 23, name: 'Chia Seeds', carbs: 12, protein: 4, calories: 137, fats: 9, sugar: 0, servingSize: '1 oz', category: 'Nuts & Seeds' },
-    
-    // Legumes
     { id: 24, name: 'Black Beans (cooked)', carbs: 41, protein: 15, calories: 227, fats: 0.9, sugar: 1, servingSize: '1 cup', category: 'Legumes' },
     { id: 25, name: 'Lentils (cooked)', carbs: 40, protein: 18, calories: 230, fats: 0.8, sugar: 4, servingSize: '1 cup', category: 'Legumes' },
   ];
 
-  // Sample entries for today
-  useEffect(() => {
-    const initializeData = () => {
-      const sampleEntries: NutritionEntry[] = [
-        {
-          id: 1,
-          name: 'Greek Yogurt with Berries',
-          carbs: 28,
-          protein: 20,
-          calories: 180,
-          fats: 2,
-          sugar: 15,
-          serving: '1 cup',
-          time: '8:30 AM',
-          mealType: 'Breakfast',
-        },
-        {
-          id: 2,
-          name: 'Quinoa Salad',
-          carbs: 45,
-          protein: 12,
-          calories: 320,
-          fats: 8,
-          sugar: 3,
-          serving: '1.5 cups',
-          time: '12:45 PM',
-          mealType: 'Lunch',
-        },
-        {
-          id: 3,
-          name: 'Apple',
-          carbs: 25,
-          protein: 0.5,
-          calories: 95,
-          fats: 0.3,
-          sugar: 19,
-          serving: '1 medium',
-          time: '3:15 PM',
-          mealType: 'Snack',
-        },
-      ];
-      setDailyEntries(sampleEntries);
-
-      // Sample blood sugar readings
-      const sampleReadings: BloodSugarReading[] = [
-        {
-          id: 1,
-          value: 95,
-          time: '7:30 AM',
-          date: new Date().toLocaleDateString('en-US'),
-          readingType: 'Fasting',
-        },
-        {
-          id: 2,
-          value: 140,
-          time: '2:15 PM',
-          date: new Date().toLocaleDateString('en-US'),
-          readingType: 'After Meal',
-          mealContext: 'Lunch',
-        },
-      ];
-      setBloodSugarReadings(sampleReadings);
-      setIsReady(true);
-    };
-
-    // Delay initialization to prevent view state issues
-    const timer = setTimeout(initializeData, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      // Cleanup any pending operations
-      setAddModalVisible(false);
-      setBloodSugarModalVisible(false);
-      setCustomMealModalVisible(false);
-    };
-  }, []);
-
-  const filteredFoods = foodDatabase.filter(food =>
-    food.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFoods = useMemo(() =>
+    foodDatabase.filter(food =>
+      food.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [searchQuery]
   );
 
-  const calculateDailyTotals = () => {
+  const dailyTotals = useMemo(() => {
     return dailyEntries.reduce(
       (totals, entry) => ({
         carbs: totals.carbs + entry.carbs,
@@ -227,9 +130,7 @@ const NutritionScreen = () => {
       }),
       { carbs: 0, protein: 0, calories: 0, fats: 0, sugar: 0 }
     );
-  };
-
-  const dailyTotals = calculateDailyTotals();
+  }, [dailyEntries]);
 
   const getProgressPercentage = (current: number, target: number) => {
     return Math.min((current / target) * 100, 100);
@@ -255,7 +156,7 @@ const NutritionScreen = () => {
     return bloodSugarReadings.filter(reading => reading.date === today);
   };
 
-  const addFoodEntry = (food: FoodItem) => {
+  const addFoodEntry = useCallback((food: FoodItem) => {
     const servingMultiplier = parseFloat(customServing) || 1;
     const newEntry: NutritionEntry = {
       id: Date.now(),
@@ -278,9 +179,9 @@ const NutritionScreen = () => {
     setAddModalVisible(false);
     setSearchQuery('');
     setCustomServing('1');
-  };
+  }, [customServing, selectedMealType]);
 
-  const removeEntry = (id: number) => {
+  const removeEntry = useCallback((id: number) => {
     Alert.alert(
       'Remove Entry',
       'Are you sure you want to remove this nutrition entry?',
@@ -291,12 +192,10 @@ const NutritionScreen = () => {
         }},
       ]
     );
-  };
+  }, []);
 
   const handleBloodSugarSave = (reading: BloodSugarReading) => {
     setBloodSugarReadings(prev => [...prev, reading]);
-    
-    // Delay the alert to prevent view conflicts
     setTimeout(() => {
       Alert.alert(
         'Blood Sugar Logged!',
@@ -323,11 +222,8 @@ const NutritionScreen = () => {
       }),
       mealType: customMealType,
     };
-
     setDailyEntries(prev => [...prev, newEntry]);
     setCustomMealModalVisible(false);
-    
-    // Delay the alert to prevent view conflicts
     setTimeout(() => {
       Alert.alert(
         'Custom Meal Added!',
@@ -346,11 +242,8 @@ const NutritionScreen = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(selectedDate.getDate() + direction);
     setSelectedDate(newDate);
-    // In a real app, you would load entries for the new date
-    if (direction !== 0) {
-      setDailyEntries([]); // Clear entries when changing dates
-      setBloodSugarReadings([]); // Clear readings when changing dates
-    }
+    setDailyEntries([]);
+    setBloodSugarReadings([]);
   };
 
   const isToday = () => {
@@ -360,23 +253,18 @@ const NutritionScreen = () => {
 
   const formatDate = (date: Date) => {
     if (isToday()) return 'Today';
-    
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
-    
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-    
     return date.toLocaleDateString('en-US', { 
       weekday: 'long',
       month: 'short', 
       day: 'numeric' 
     });
   };
-
-  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
   const getEntriesForMealType = (mealType: string) => {
     return dailyEntries.filter(entry => entry.mealType === mealType);
@@ -387,17 +275,6 @@ const NutritionScreen = () => {
     ? todaysBloodSugarReadings[todaysBloodSugarReadings.length - 1] 
     : null;
 
-  // Show loading state to prevent view state issues
-  if (!isReady) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 16, color: '#374151' }}>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -406,7 +283,6 @@ const NutritionScreen = () => {
           <Text style={styles.title}>Nutrition Tracker</Text>
           <Text style={styles.subtitle}>Monitor your daily carbs and nutrients</Text>
         </View>
-
         {/* Date Navigation */}
         <View style={styles.dateNavigation}>
           <TouchableOpacity 
@@ -417,7 +293,6 @@ const NutritionScreen = () => {
               <ChevronLeft size={20} color="#16A34A" />
             </View>
           </TouchableOpacity>
-          
           <View style={styles.dateInfo}>
             <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
             <Text style={styles.dateSubtext}>
@@ -428,7 +303,6 @@ const NutritionScreen = () => {
               })}
             </Text>
           </View>
-          
           <TouchableOpacity 
             style={styles.dateNavButton} 
             onPress={() => navigateDate(1)}
@@ -438,18 +312,16 @@ const NutritionScreen = () => {
             </View>
           </TouchableOpacity>
         </View>
-
         {/* Daily Progress Overview */}
         <View style={styles.progressCard}>
           <Text style={styles.progressTitle}>Daily Progress</Text>
-          
           {/* Carbs - Primary Focus */}
           <View style={styles.primaryProgress}>
             <View style={styles.progressHeader}>
               <View style={styles.progressLabelContainer}>
                 <View>
-              <Target size={20} color="#16A34A" />
-            </View>
+                  <Target size={20} color="#16A34A" />
+                </View>
                 <Text style={styles.primaryProgressLabel}>Carbohydrates</Text>
               </View>
               <Text style={styles.primaryProgressValue}>
@@ -471,14 +343,13 @@ const NutritionScreen = () => {
               {Math.round(getProgressPercentage(dailyTotals.carbs, dailyTargets.carbs))}% of daily target
             </Text>
           </View>
-
           {/* Other Nutrients */}
           <View style={styles.secondaryProgressGrid}>
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
                 <View>
-              <Zap size={16} color="#F59E0B" />
-            </View>
+                  <Zap size={16} color="#F59E0B" />
+                </View>
                 <Text style={styles.secondaryProgressLabel}>Protein</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -488,12 +359,11 @@ const NutritionScreen = () => {
                 of {dailyTargets.protein}g
               </Text>
             </View>
-
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
                 <View>
-              <Activity size={16} color="#EF4444" />
-            </View>
+                  <Activity size={16} color="#EF4444" />
+                </View>
                 <Text style={styles.secondaryProgressLabel}>Calories</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -503,12 +373,11 @@ const NutritionScreen = () => {
                 of {dailyTargets.calories}
               </Text>
             </View>
-
             <View style={styles.secondaryProgressItem}>
               <View style={styles.secondaryProgressHeader}>
                 <View>
-              <Heart size={16} color="#10B981" />
-            </View>
+                  <Heart size={16} color="#10B981" />
+                </View>
                 <Text style={styles.secondaryProgressLabel}>Fats</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
@@ -520,14 +389,13 @@ const NutritionScreen = () => {
             </View>
           </View>
         </View>
-
         {/* Blood Sugar Card */}
         <View style={styles.bloodSugarCard}>
           <View style={styles.bloodSugarHeader}>
             <View style={styles.bloodSugarTitleContainer}>
               <View>
-              <Droplets size={20} color="#10B981" />
-            </View>
+                <Droplets size={20} color="#10B981" />
+              </View>
               <Text style={styles.bloodSugarTitle}>Blood Sugar</Text>
             </View>
             <TouchableOpacity 
@@ -535,12 +403,11 @@ const NutritionScreen = () => {
               onPress={() => setBloodSugarModalVisible(true)}
             >
               <View>
-              <Plus size={16} color="#ffffff" />
-            </View>
+                <Plus size={16} color="#ffffff" />
+              </View>
               <Text style={styles.bloodSugarLogText}>Log</Text>
             </TouchableOpacity>
           </View>
-          
           {latestBloodSugar ? (
             <View style={styles.bloodSugarContent}>
               <View style={styles.bloodSugarMain}>
@@ -560,8 +427,6 @@ const NutritionScreen = () => {
                   {latestBloodSugar.readingType} • {latestBloodSugar.time}
                 </Text>
               </View>
-              
-              {/* Show all readings for today */}
               {todaysBloodSugarReadings.length > 1 && (
                 <View style={styles.bloodSugarHistory}>
                   <Text style={styles.bloodSugarHistoryTitle}>Today's Readings</Text>
@@ -585,9 +450,6 @@ const NutritionScreen = () => {
             </View>
           )}
         </View>
-
-
-
         {/* Meals by Type */}
         {mealTypes.map((mealType) => {
           const mealEntries = getEntriesForMealType(mealType);
@@ -598,7 +460,6 @@ const NutritionScreen = () => {
             }),
             { carbs: 0, calories: 0 }
           );
-
           return (
             <View key={mealType} style={styles.mealSection}>
               <View style={styles.mealHeader}>
@@ -608,7 +469,6 @@ const NutritionScreen = () => {
                   <Text style={styles.mealCalorieTotal}>{mealTotals.calories} cal</Text>
                 </View>
               </View>
-
               {mealEntries.length === 0 ? (
                 <View style={styles.emptyMealActions}>
                   <TouchableOpacity 
@@ -623,7 +483,6 @@ const NutritionScreen = () => {
                     </View>
                     <Text style={styles.emptyMealText}>Add {mealType.toLowerCase()}</Text>
                   </TouchableOpacity>
-                  
                   <TouchableOpacity 
                     style={[styles.emptyMealCard, styles.customMealCard]}
                     onPress={() => handleOpenCustomMealModal(mealType as any)}
@@ -676,7 +535,6 @@ const NutritionScreen = () => {
                       </TouchableOpacity>
                     </View>
                   ))}
-                  
                   <View style={styles.addMoreActions}>
                     <TouchableOpacity 
                       style={styles.addMoreButton}
@@ -690,7 +548,6 @@ const NutritionScreen = () => {
                       </View>
                       <Text style={styles.addMoreText}>Add more to {mealType.toLowerCase()}</Text>
                     </TouchableOpacity>
-                    
                     <TouchableOpacity 
                       style={[styles.addMoreButton, styles.customMealAddButton]}
                       onPress={() => handleOpenCustomMealModal(mealType as any)}
@@ -706,7 +563,6 @@ const NutritionScreen = () => {
             </View>
           );
         })}
-
         {/* Daily Summary */}
         {dailyEntries.length > 0 && (
           <View style={styles.summaryCard}>
@@ -732,7 +588,6 @@ const NutritionScreen = () => {
           </View>
         )}
       </ScrollView>
-
       {/* Add Food Modal */}
       {addModalVisible && (
         <Modal
@@ -742,113 +597,108 @@ const NutritionScreen = () => {
           onRequestClose={() => setAddModalVisible(false)}
         >
           <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity 
-              style={styles.modalCloseButton}
-              onPress={() => setAddModalVisible(false)}
-            >
+            <View style={styles.modalHeader}>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => setAddModalVisible(false)}
+              >
+                <View>
+                  <X size={24} color="#111827" />
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Add Food</Text>
+              <View style={styles.modalHeaderSpacer} />
+            </View>
+            {/* Meal Type Selector */}
+            <View style={styles.mealTypeSelector}>
+              <Text style={styles.mealTypeSelectorTitle}>Add to:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {mealTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.mealTypeChip,
+                      selectedMealType === type && styles.mealTypeChipSelected,
+                    ]}
+                    onPress={() => setSelectedMealType(type as any)}
+                  >
+                    <Text style={[
+                      styles.mealTypeChipText,
+                      selectedMealType === type && styles.mealTypeChipTextSelected,
+                    ]}>
+                      {type}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+            {/* Search */}
+            <View style={styles.searchContainer}>
               <View>
-              <X size={24} color="#111827" />
+                <Search size={20} color="#6B7280" />
+              </View>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search foods..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
             </View>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Add Food</Text>
-            <View style={styles.modalHeaderSpacer} />
-          </View>
-
-          {/* Meal Type Selector */}
-          <View style={styles.mealTypeSelector}>
-            <Text style={styles.mealTypeSelectorTitle}>Add to:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {mealTypes.map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  style={[
-                    styles.mealTypeChip,
-                    selectedMealType === type && styles.mealTypeChipSelected,
-                  ]}
-                  onPress={() => setSelectedMealType(type as any)}
-                >
-                  <Text style={[
-                    styles.mealTypeChipText,
-                    selectedMealType === type && styles.mealTypeChipTextSelected,
-                  ]}>
-                    {type}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            {/* Serving Size */}
+            <View style={styles.servingContainer}>
+              <Text style={styles.servingLabel}>Serving size multiplier:</Text>
+              <TextInput
+                style={styles.servingInput}
+                value={customServing}
+                onChangeText={setCustomServing}
+                keyboardType="decimal-pad"
+                placeholder="1.0"
+              />
+            </View>
+            {/* Food List */}
+            <ScrollView style={styles.foodList} showsVerticalScrollIndicator={false}>
+              {filteredFoods.map((food) => {
+                const servingMultiplier = parseFloat(customServing) || 1;
+                return (
+                  <TouchableOpacity
+                    key={food.id}
+                    style={styles.foodItem}
+                    onPress={() => addFoodEntry(food)}
+                  >
+                    <View style={styles.foodItemHeader}>
+                      <Text style={styles.foodItemName}>{food.name}</Text>
+                      <Text style={styles.foodItemCategory}>{food.category}</Text>
+                    </View>
+                    <Text style={styles.foodItemServing}>
+                      {customServing !== '1' ? `${customServing}x ` : ''}{food.servingSize}
+                    </Text>
+                    <View style={styles.foodItemNutrients}>
+                      <View style={styles.foodNutrientItem}>
+                        <Text style={styles.foodNutrientValue}>
+                          {Math.round(food.carbs * servingMultiplier * 10) / 10}g
+                        </Text>
+                        <Text style={styles.foodNutrientLabel}>carbs</Text>
+                      </View>
+                      <View style={styles.foodNutrientItem}>
+                        <Text style={styles.foodNutrientValue}>
+                          {Math.round(food.protein * servingMultiplier * 10) / 10}g
+                        </Text>
+                        <Text style={styles.foodNutrientLabel}>protein</Text>
+                      </View>
+                      <View style={styles.foodNutrientItem}>
+                        <Text style={styles.foodNutrientValue}>
+                          {Math.round(food.calories * servingMultiplier)}
+                        </Text>
+                        <Text style={styles.foodNutrientLabel}>cal</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
-          </View>
-
-          {/* Search */}
-          <View style={styles.searchContainer}>
-            <View>
-              <Search size={20} color="#6B7280" />
-            </View>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search foods..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          {/* Serving Size */}
-          <View style={styles.servingContainer}>
-            <Text style={styles.servingLabel}>Serving size multiplier:</Text>
-            <TextInput
-              style={styles.servingInput}
-              value={customServing}
-              onChangeText={setCustomServing}
-              keyboardType="decimal-pad"
-              placeholder="1.0"
-            />
-          </View>
-
-          {/* Food List */}
-          <ScrollView style={styles.foodList} showsVerticalScrollIndicator={false}>
-            {filteredFoods.map((food) => {
-              const servingMultiplier = parseFloat(customServing) || 1;
-              return (
-                <TouchableOpacity
-                  key={food.id}
-                  style={styles.foodItem}
-                  onPress={() => addFoodEntry(food)}
-                >
-                  <View style={styles.foodItemHeader}>
-                    <Text style={styles.foodItemName}>{food.name}</Text>
-                    <Text style={styles.foodItemCategory}>{food.category}</Text>
-                  </View>
-                  <Text style={styles.foodItemServing}>
-                    {customServing !== '1' ? `${customServing}x ` : ''}{food.servingSize}
-                  </Text>
-                  <View style={styles.foodItemNutrients}>
-                    <View style={styles.foodNutrientItem}>
-                      <Text style={styles.foodNutrientValue}>
-                        {Math.round(food.carbs * servingMultiplier * 10) / 10}g
-                      </Text>
-                      <Text style={styles.foodNutrientLabel}>carbs</Text>
-                    </View>
-                    <View style={styles.foodNutrientItem}>
-                      <Text style={styles.foodNutrientValue}>
-                        {Math.round(food.protein * servingMultiplier * 10) / 10}g
-                      </Text>
-                      <Text style={styles.foodNutrientLabel}>protein</Text>
-                    </View>
-                    <View style={styles.foodNutrientItem}>
-                      <Text style={styles.foodNutrientValue}>
-                        {Math.round(food.calories * servingMultiplier)}
-                      </Text>
-                      <Text style={styles.foodNutrientLabel}>cal</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </SafeAreaView>
+          </SafeAreaView>
         </Modal>
       )}
-
       {/* Blood Sugar Modal */}
       {bloodSugarModalVisible && (
         <BloodSugarModal
@@ -857,7 +707,6 @@ const NutritionScreen = () => {
           onSave={handleBloodSugarSave}
         />
       )}
-
       {/* Custom Meal Modal */}
       {customMealModalVisible && (
         <CustomMealModal
@@ -882,6 +731,8 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   title: {
     fontSize: 32,
@@ -1137,7 +988,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
   },
-
   mealSection: {
     marginBottom: 24,
   },

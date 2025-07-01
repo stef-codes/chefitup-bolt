@@ -40,7 +40,7 @@ interface NutritionEntry {
   carbs: number;
   protein: number;
   calories: number;
-  fiber: number;
+  fats: number;
   sugar: number;
   serving: string;
   time: string;
@@ -63,7 +63,7 @@ interface FoodItem {
   carbs: number;
   protein: number;
   calories: number;
-  fiber: number;
+  fats: number;
   sugar: number;
   servingSize: string;
   category: string;
@@ -80,118 +80,136 @@ const NutritionScreen = () => {
   const [selectedMealType, setSelectedMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
   const [customServing, setCustomServing] = useState('1');
   const [customMealType, setCustomMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast');
+  const [isReady, setIsReady] = useState(false);
 
   // User's daily targets
   const dailyTargets = {
     carbs: 150,
     protein: 120,
     calories: 1800,
-    fiber: 25,
+    fats: 65,
   };
 
   // Sample food database
   const foodDatabase: FoodItem[] = [
     // Fruits
-    { id: 1, name: 'Apple (medium)', carbs: 25, protein: 0.5, calories: 95, fiber: 4, sugar: 19, servingSize: '1 medium', category: 'Fruits' },
-    { id: 2, name: 'Banana (medium)', carbs: 27, protein: 1.3, calories: 105, fiber: 3, sugar: 14, servingSize: '1 medium', category: 'Fruits' },
-    { id: 3, name: 'Orange (medium)', carbs: 15, protein: 1.2, calories: 62, fiber: 3, sugar: 12, servingSize: '1 medium', category: 'Fruits' },
-    { id: 4, name: 'Blueberries', carbs: 21, protein: 1.1, calories: 84, fiber: 4, sugar: 15, servingSize: '1 cup', category: 'Fruits' },
-    { id: 5, name: 'Strawberries', carbs: 11, protein: 1, calories: 49, fiber: 3, sugar: 7, servingSize: '1 cup', category: 'Fruits' },
+    { id: 1, name: 'Apple (medium)', carbs: 25, protein: 0.5, calories: 95, fats: 0.3, sugar: 19, servingSize: '1 medium', category: 'Fruits' },
+    { id: 2, name: 'Banana (medium)', carbs: 27, protein: 1.3, calories: 105, fats: 0.4, sugar: 14, servingSize: '1 medium', category: 'Fruits' },
+    { id: 3, name: 'Orange (medium)', carbs: 15, protein: 1.2, calories: 62, fats: 0.2, sugar: 12, servingSize: '1 medium', category: 'Fruits' },
+    { id: 4, name: 'Blueberries', carbs: 21, protein: 1.1, calories: 84, fats: 0.5, sugar: 15, servingSize: '1 cup', category: 'Fruits' },
+    { id: 5, name: 'Strawberries', carbs: 11, protein: 1, calories: 49, fats: 0.5, sugar: 7, servingSize: '1 cup', category: 'Fruits' },
     
     // Vegetables
-    { id: 6, name: 'Broccoli (cooked)', carbs: 11, protein: 4, calories: 55, fiber: 5, sugar: 2, servingSize: '1 cup', category: 'Vegetables' },
-    { id: 7, name: 'Spinach (raw)', carbs: 1, protein: 1, calories: 7, fiber: 1, sugar: 0, servingSize: '1 cup', category: 'Vegetables' },
-    { id: 8, name: 'Sweet Potato (baked)', carbs: 27, protein: 2, calories: 112, fiber: 4, sugar: 5, servingSize: '1 medium', category: 'Vegetables' },
-    { id: 9, name: 'Carrots (raw)', carbs: 12, protein: 1, calories: 50, fiber: 3, sugar: 6, servingSize: '1 cup', category: 'Vegetables' },
-    { id: 10, name: 'Bell Pepper (red)', carbs: 7, protein: 1, calories: 31, fiber: 2, sugar: 5, servingSize: '1 cup', category: 'Vegetables' },
+    { id: 6, name: 'Broccoli (cooked)', carbs: 11, protein: 4, calories: 55, fats: 0.6, sugar: 2, servingSize: '1 cup', category: 'Vegetables' },
+    { id: 7, name: 'Spinach (raw)', carbs: 1, protein: 1, calories: 7, fats: 0.1, sugar: 0, servingSize: '1 cup', category: 'Vegetables' },
+    { id: 8, name: 'Sweet Potato (baked)', carbs: 27, protein: 2, calories: 112, fats: 0.2, sugar: 5, servingSize: '1 medium', category: 'Vegetables' },
+    { id: 9, name: 'Carrots (raw)', carbs: 12, protein: 1, calories: 50, fats: 0.3, sugar: 6, servingSize: '1 cup', category: 'Vegetables' },
+    { id: 10, name: 'Bell Pepper (red)', carbs: 7, protein: 1, calories: 31, fats: 0.3, sugar: 5, servingSize: '1 cup', category: 'Vegetables' },
     
     // Grains
-    { id: 11, name: 'Brown Rice (cooked)', carbs: 45, protein: 5, calories: 216, fiber: 4, sugar: 1, servingSize: '1 cup', category: 'Grains' },
-    { id: 12, name: 'Quinoa (cooked)', carbs: 39, protein: 8, calories: 222, fiber: 5, sugar: 2, servingSize: '1 cup', category: 'Grains' },
-    { id: 13, name: 'Oatmeal (cooked)', carbs: 28, protein: 6, calories: 154, fiber: 4, sugar: 1, servingSize: '1 cup', category: 'Grains' },
-    { id: 14, name: 'Whole Wheat Bread', carbs: 14, protein: 4, calories: 81, fiber: 2, sugar: 1, servingSize: '1 slice', category: 'Grains' },
+    { id: 11, name: 'Brown Rice (cooked)', carbs: 45, protein: 5, calories: 216, fats: 1.8, sugar: 1, servingSize: '1 cup', category: 'Grains' },
+    { id: 12, name: 'Quinoa (cooked)', carbs: 39, protein: 8, calories: 222, fats: 3.6, sugar: 2, servingSize: '1 cup', category: 'Grains' },
+    { id: 13, name: 'Oatmeal (cooked)', carbs: 28, protein: 6, calories: 154, fats: 2.6, sugar: 1, servingSize: '1 cup', category: 'Grains' },
+    { id: 14, name: 'Whole Wheat Bread', carbs: 14, protein: 4, calories: 81, fats: 1.1, sugar: 1, servingSize: '1 slice', category: 'Grains' },
     
     // Proteins
-    { id: 15, name: 'Chicken Breast (grilled)', carbs: 0, protein: 31, calories: 165, fiber: 0, sugar: 0, servingSize: '100g', category: 'Proteins' },
-    { id: 16, name: 'Salmon (grilled)', carbs: 0, protein: 25, calories: 206, fiber: 0, sugar: 0, servingSize: '100g', category: 'Proteins' },
-    { id: 17, name: 'Greek Yogurt (plain)', carbs: 9, protein: 20, calories: 130, fiber: 0, sugar: 9, servingSize: '1 cup', category: 'Proteins' },
-    { id: 18, name: 'Eggs (large)', carbs: 1, protein: 6, calories: 70, fiber: 0, sugar: 1, servingSize: '1 egg', category: 'Proteins' },
-    { id: 19, name: 'Tofu (firm)', carbs: 3, protein: 20, calories: 181, fiber: 3, sugar: 1, servingSize: '100g', category: 'Proteins' },
+    { id: 15, name: 'Chicken Breast (grilled)', carbs: 0, protein: 31, calories: 165, fats: 3.6, sugar: 0, servingSize: '100g', category: 'Proteins' },
+    { id: 16, name: 'Salmon (grilled)', carbs: 0, protein: 25, calories: 206, fats: 12, sugar: 0, servingSize: '100g', category: 'Proteins' },
+    { id: 17, name: 'Greek Yogurt (plain)', carbs: 9, protein: 20, calories: 130, fats: 0.5, sugar: 9, servingSize: '1 cup', category: 'Proteins' },
+    { id: 18, name: 'Eggs (large)', carbs: 1, protein: 6, calories: 70, fats: 5, sugar: 1, servingSize: '1 egg', category: 'Proteins' },
+    { id: 19, name: 'Tofu (firm)', carbs: 3, protein: 20, calories: 181, fats: 11, sugar: 1, servingSize: '100g', category: 'Proteins' },
     
     // Dairy
-    { id: 20, name: 'Milk (2%)', carbs: 12, protein: 8, calories: 122, fiber: 0, sugar: 12, servingSize: '1 cup', category: 'Dairy' },
-    { id: 21, name: 'Cheddar Cheese', carbs: 1, protein: 7, calories: 113, fiber: 0, sugar: 0, servingSize: '1 oz', category: 'Dairy' },
+    { id: 20, name: 'Milk (2%)', carbs: 12, protein: 8, calories: 122, fats: 5, sugar: 12, servingSize: '1 cup', category: 'Dairy' },
+    { id: 21, name: 'Cheddar Cheese', carbs: 1, protein: 7, calories: 113, fats: 9, sugar: 0, servingSize: '1 oz', category: 'Dairy' },
     
     // Nuts & Seeds
-    { id: 22, name: 'Almonds', carbs: 6, protein: 6, calories: 164, fiber: 4, sugar: 1, servingSize: '1 oz', category: 'Nuts & Seeds' },
-    { id: 23, name: 'Chia Seeds', carbs: 12, protein: 4, calories: 137, fiber: 10, sugar: 0, servingSize: '1 oz', category: 'Nuts & Seeds' },
+    { id: 22, name: 'Almonds', carbs: 6, protein: 6, calories: 164, fats: 14, sugar: 1, servingSize: '1 oz', category: 'Nuts & Seeds' },
+    { id: 23, name: 'Chia Seeds', carbs: 12, protein: 4, calories: 137, fats: 9, sugar: 0, servingSize: '1 oz', category: 'Nuts & Seeds' },
     
     // Legumes
-    { id: 24, name: 'Black Beans (cooked)', carbs: 41, protein: 15, calories: 227, fiber: 15, sugar: 1, servingSize: '1 cup', category: 'Legumes' },
-    { id: 25, name: 'Lentils (cooked)', carbs: 40, protein: 18, calories: 230, fiber: 16, sugar: 4, servingSize: '1 cup', category: 'Legumes' },
+    { id: 24, name: 'Black Beans (cooked)', carbs: 41, protein: 15, calories: 227, fats: 0.9, sugar: 1, servingSize: '1 cup', category: 'Legumes' },
+    { id: 25, name: 'Lentils (cooked)', carbs: 40, protein: 18, calories: 230, fats: 0.8, sugar: 4, servingSize: '1 cup', category: 'Legumes' },
   ];
 
   // Sample entries for today
   useEffect(() => {
-    const sampleEntries: NutritionEntry[] = [
-      {
-        id: 1,
-        name: 'Greek Yogurt with Berries',
-        carbs: 28,
-        protein: 20,
-        calories: 180,
-        fiber: 4,
-        sugar: 15,
-        serving: '1 cup',
-        time: '8:30 AM',
-        mealType: 'Breakfast',
-      },
-      {
-        id: 2,
-        name: 'Quinoa Salad',
-        carbs: 45,
-        protein: 12,
-        calories: 320,
-        fiber: 6,
-        sugar: 3,
-        serving: '1.5 cups',
-        time: '12:45 PM',
-        mealType: 'Lunch',
-      },
-      {
-        id: 3,
-        name: 'Apple',
-        carbs: 25,
-        protein: 0.5,
-        calories: 95,
-        fiber: 4,
-        sugar: 19,
-        serving: '1 medium',
-        time: '3:15 PM',
-        mealType: 'Snack',
-      },
-    ];
-    setDailyEntries(sampleEntries);
+    const initializeData = () => {
+      const sampleEntries: NutritionEntry[] = [
+        {
+          id: 1,
+          name: 'Greek Yogurt with Berries',
+          carbs: 28,
+          protein: 20,
+          calories: 180,
+          fats: 2,
+          sugar: 15,
+          serving: '1 cup',
+          time: '8:30 AM',
+          mealType: 'Breakfast',
+        },
+        {
+          id: 2,
+          name: 'Quinoa Salad',
+          carbs: 45,
+          protein: 12,
+          calories: 320,
+          fats: 8,
+          sugar: 3,
+          serving: '1.5 cups',
+          time: '12:45 PM',
+          mealType: 'Lunch',
+        },
+        {
+          id: 3,
+          name: 'Apple',
+          carbs: 25,
+          protein: 0.5,
+          calories: 95,
+          fats: 0.3,
+          sugar: 19,
+          serving: '1 medium',
+          time: '3:15 PM',
+          mealType: 'Snack',
+        },
+      ];
+      setDailyEntries(sampleEntries);
 
-    // Sample blood sugar readings
-    const sampleReadings: BloodSugarReading[] = [
-      {
-        id: 1,
-        value: 95,
-        time: '7:30 AM',
-        date: new Date().toLocaleDateString('en-US'),
-        readingType: 'Fasting',
-      },
-      {
-        id: 2,
-        value: 140,
-        time: '2:15 PM',
-        date: new Date().toLocaleDateString('en-US'),
-        readingType: 'After Meal',
-        mealContext: 'Lunch',
-      },
-    ];
-    setBloodSugarReadings(sampleReadings);
+      // Sample blood sugar readings
+      const sampleReadings: BloodSugarReading[] = [
+        {
+          id: 1,
+          value: 95,
+          time: '7:30 AM',
+          date: new Date().toLocaleDateString('en-US'),
+          readingType: 'Fasting',
+        },
+        {
+          id: 2,
+          value: 140,
+          time: '2:15 PM',
+          date: new Date().toLocaleDateString('en-US'),
+          readingType: 'After Meal',
+          mealContext: 'Lunch',
+        },
+      ];
+      setBloodSugarReadings(sampleReadings);
+      setIsReady(true);
+    };
+
+    // Delay initialization to prevent view state issues
+    const timer = setTimeout(initializeData, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      // Cleanup any pending operations
+      setAddModalVisible(false);
+      setBloodSugarModalVisible(false);
+      setCustomMealModalVisible(false);
+    };
   }, []);
 
   const filteredFoods = foodDatabase.filter(food =>
@@ -204,10 +222,10 @@ const NutritionScreen = () => {
         carbs: totals.carbs + entry.carbs,
         protein: totals.protein + entry.protein,
         calories: totals.calories + entry.calories,
-        fiber: totals.fiber + entry.fiber,
+        fats: totals.fats + entry.fats,
         sugar: totals.sugar + entry.sugar,
       }),
-      { carbs: 0, protein: 0, calories: 0, fiber: 0, sugar: 0 }
+      { carbs: 0, protein: 0, calories: 0, fats: 0, sugar: 0 }
     );
   };
 
@@ -245,7 +263,7 @@ const NutritionScreen = () => {
       carbs: Math.round(food.carbs * servingMultiplier * 10) / 10,
       protein: Math.round(food.protein * servingMultiplier * 10) / 10,
       calories: Math.round(food.calories * servingMultiplier),
-      fiber: Math.round(food.fiber * servingMultiplier * 10) / 10,
+      fats: Math.round(food.fats * servingMultiplier * 10) / 10,
       sugar: Math.round(food.sugar * servingMultiplier * 10) / 10,
       serving: `${customServing} ${food.servingSize}`,
       time: new Date().toLocaleTimeString('en-US', { 
@@ -256,7 +274,7 @@ const NutritionScreen = () => {
       mealType: selectedMealType,
     };
 
-    setDailyEntries([...dailyEntries, newEntry]);
+    setDailyEntries(prev => [...prev, newEntry]);
     setAddModalVisible(false);
     setSearchQuery('');
     setCustomServing('1');
@@ -269,19 +287,23 @@ const NutritionScreen = () => {
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Remove', style: 'destructive', onPress: () => {
-          setDailyEntries(dailyEntries.filter(entry => entry.id !== id));
+          setDailyEntries(prev => prev.filter(entry => entry.id !== id));
         }},
       ]
     );
   };
 
   const handleBloodSugarSave = (reading: BloodSugarReading) => {
-    setBloodSugarReadings([...bloodSugarReadings, reading]);
-    Alert.alert(
-      'Blood Sugar Logged!',
-      `Recorded ${reading.value} mg/dL reading`,
-      [{ text: 'OK' }]
-    );
+    setBloodSugarReadings(prev => [...prev, reading]);
+    
+    // Delay the alert to prevent view conflicts
+    setTimeout(() => {
+      Alert.alert(
+        'Blood Sugar Logged!',
+        `Recorded ${reading.value} mg/dL reading`,
+        [{ text: 'OK' }]
+      );
+    }, 100);
   };
 
   const handleCustomMealSave = (customMeal: any) => {
@@ -291,7 +313,7 @@ const NutritionScreen = () => {
       carbs: customMeal.carbs,
       protein: customMeal.protein,
       calories: customMeal.calories,
-      fiber: customMeal.fiber,
+      fats: customMeal.fats,
       sugar: customMeal.sugar,
       serving: customMeal.serving,
       time: new Date().toLocaleTimeString('en-US', { 
@@ -304,11 +326,15 @@ const NutritionScreen = () => {
 
     setDailyEntries(prev => [...prev, newEntry]);
     setCustomMealModalVisible(false);
-    Alert.alert(
-      'Custom Meal Added!',
-      `${customMeal.name} has been added to your ${customMealType.toLowerCase()}`,
-      [{ text: 'OK' }]
-    );
+    
+    // Delay the alert to prevent view conflicts
+    setTimeout(() => {
+      Alert.alert(
+        'Custom Meal Added!',
+        `${customMeal.name} has been added to your ${customMealType.toLowerCase()}`,
+        [{ text: 'OK' }]
+      );
+    }, 100);
   };
 
   const handleOpenCustomMealModal = (mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack') => {
@@ -360,6 +386,17 @@ const NutritionScreen = () => {
   const latestBloodSugar = todaysBloodSugarReadings.length > 0 
     ? todaysBloodSugarReadings[todaysBloodSugarReadings.length - 1] 
     : null;
+
+  // Show loading state to prevent view state issues
+  if (!isReady) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#374151' }}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -472,13 +509,13 @@ const NutritionScreen = () => {
                 <View>
               <Heart size={16} color="#10B981" />
             </View>
-                <Text style={styles.secondaryProgressLabel}>Fiber</Text>
+                <Text style={styles.secondaryProgressLabel}>Fats</Text>
               </View>
               <Text style={styles.secondaryProgressValue}>
-                {dailyTotals.fiber}g
+                {dailyTotals.fats}g
               </Text>
               <Text style={styles.secondaryProgressTarget}>
-                of {dailyTargets.fiber}g
+                of {dailyTargets.fats}g
               </Text>
             </View>
           </View>
@@ -624,8 +661,8 @@ const NutritionScreen = () => {
                             <Text style={styles.nutrientLabel}>cal</Text>
                           </View>
                           <View style={styles.nutrientItem}>
-                            <Text style={styles.nutrientValue}>{entry.fiber}g</Text>
-                            <Text style={styles.nutrientLabel}>fiber</Text>
+                            <Text style={styles.nutrientValue}>{entry.fats}g</Text>
+                            <Text style={styles.nutrientLabel}>fats</Text>
                           </View>
                         </View>
                       </TouchableOpacity>
@@ -697,12 +734,14 @@ const NutritionScreen = () => {
       </ScrollView>
 
       {/* Add Food Modal */}
-      <Modal
-        visible={addModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <SafeAreaView style={styles.modalContainer}>
+      {addModalVisible && (
+        <Modal
+          visible={true}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setAddModalVisible(false)}
+        >
+          <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity 
               style={styles.modalCloseButton}
@@ -807,22 +846,27 @@ const NutritionScreen = () => {
             })}
           </ScrollView>
         </SafeAreaView>
-      </Modal>
+        </Modal>
+      )}
 
       {/* Blood Sugar Modal */}
-      <BloodSugarModal
-        visible={bloodSugarModalVisible}
-        onClose={() => setBloodSugarModalVisible(false)}
-        onSave={handleBloodSugarSave}
-      />
+      {bloodSugarModalVisible && (
+        <BloodSugarModal
+          visible={true}
+          onClose={() => setBloodSugarModalVisible(false)}
+          onSave={handleBloodSugarSave}
+        />
+      )}
 
       {/* Custom Meal Modal */}
-      <CustomMealModal
-        visible={customMealModalVisible}
-        onClose={() => setCustomMealModalVisible(false)}
-        onSave={handleCustomMealSave}
-        mealType={customMealType}
-      />
+      {customMealModalVisible && (
+        <CustomMealModal
+          visible={true}
+          onClose={() => setCustomMealModalVisible(false)}
+          onSave={handleCustomMealSave}
+          mealType={customMealType}
+        />
+      )}
     </SafeAreaView>
   );
 };

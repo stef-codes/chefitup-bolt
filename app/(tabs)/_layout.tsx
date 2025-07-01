@@ -28,9 +28,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ size, color }) => (
-            <View>
-              <Home size={size} color={color} />
-            </View>
+            <Home size={size} color={color} />
           ),
         }}
       />
@@ -39,9 +37,7 @@ export default function TabLayout() {
         options={{
           title: 'Nutrition',
           tabBarIcon: ({ size, color }) => (
-            <View>
-              <Target size={size} color={color} />
-            </View>
+            <Target size={size} color={color} />
           ),
         }}
       />
@@ -50,9 +46,7 @@ export default function TabLayout() {
         options={{
           title: 'Meals',
           tabBarIcon: ({ size, color }) => (
-            <View>
-              <Calendar size={size} color={color} />
-            </View>
+            <Calendar size={size} color={color} />
           ),
         }}
       />
@@ -61,9 +55,7 @@ export default function TabLayout() {
         options={{
           title: 'Shop',
           tabBarIcon: ({ size, color }) => (
-            <View>
-              <ShoppingCart size={size} color={color} />
-            </View>
+            <ShoppingCart size={size} color={color} />
           ),
         }}
       />

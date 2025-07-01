@@ -17,7 +17,7 @@ interface CustomMeal {
   carbs: number;
   protein: number;
   calories: number;
-  fiber: number;
+  fats: number;
   sugar: number;
   serving: string;
   notes?: string;
@@ -40,7 +40,7 @@ const CustomMealModal: React.FC<CustomMealModalProps> = ({
   const [carbs, setCarbs] = useState('');
   const [protein, setProtein] = useState('');
   const [calories, setCalories] = useState('');
-  const [fiber, setFiber] = useState('');
+  const [fats, setFats] = useState('');
   const [sugar, setSugar] = useState('');
   const [serving, setServing] = useState('');
   const [notes, setNotes] = useState('');
@@ -62,7 +62,7 @@ const CustomMealModal: React.FC<CustomMealModalProps> = ({
       carbs: parseFloat(carbs) || 0,
       protein: parseFloat(protein) || 0,
       calories: parseFloat(calories) || 0,
-      fiber: parseFloat(fiber) || 0,
+      fats: parseFloat(fats) || 0,
       sugar: parseFloat(sugar) || 0,
       serving: serving.trim() || '1 serving',
       notes: notes.trim() || undefined,
@@ -77,7 +77,7 @@ const CustomMealModal: React.FC<CustomMealModalProps> = ({
     setCarbs('');
     setProtein('');
     setCalories('');
-    setFiber('');
+    setFats('');
     setSugar('');
     setServing('');
     setNotes('');
@@ -191,11 +191,11 @@ const CustomMealModal: React.FC<CustomMealModalProps> = ({
               </View>
 
               <View style={styles.nutritionInput}>
-                <Text style={styles.label}>Fiber (g)</Text>
+                <Text style={styles.label}>Fats (g)</Text>
                 <TextInput
                   style={styles.numberInput}
-                  value={fiber}
-                  onChangeText={setFiber}
+                  value={fats}
+                  onChangeText={setFats}
                   placeholder="0"
                   keyboardType="decimal-pad"
                   placeholderTextColor="#9CA3AF"

@@ -8,16 +8,36 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Target, TrendingUp, Bell, ChevronRight, Award, Calendar } from 'lucide-react-native';
+import { User, Settings, Heart, Target, TrendingUp, Bell, ChevronRight, Award, Calendar, Edit3 } from 'lucide-react-native';
+import { useUser } from '../../contexts/UserContext';
 
 const ProfileScreen = () => {
-  const userProfile = {
+  const { userProfile, isLoading } = useUser();
+
+  // Fallback data if userProfile is not loaded yet
+  const displayProfile = userProfile || {
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
     diabetesType: 'Type 2',
-    carbBudget: 150,
+    carbBudget: '150',
     joinDate: 'March 2024',
-    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+    restrictions: [],
+    goals: [],
+    cookingLevel: '',
+    age: '',
+    preferences: {
+      notifications: true,
+      mealReminders: true,
+      carbTracking: true,
+      bloodSugarTracking: true,
+    },
+    stats: {
+      mealsPrepped: 47,
+      recipesTried: 23,
+      streakDays: 12,
+      avgDailyCarbs: 142,
+    },
   };
 
   const achievements = [
@@ -27,12 +47,7 @@ const ProfileScreen = () => {
     { id: 4, title: 'Prep Master', icon: Award, earned: false },
   ];
 
-  const stats = [
-    { label: 'Meals Prepped', value: '47', color: '#16A34A' },
-    { label: 'Recipes Tried', value: '23', color: '#10B981' },
-    { label: 'Streak Days', value: '12', color: '#F59E0B' },
-    { label: 'Avg Daily Carbs', value: '142g', color: '#8B5CF6' },
-  ];
+
 
   const menuItems = [
     { icon: Settings, title: 'Settings', subtitle: 'App preferences and notifications', action: () => {} },
@@ -52,14 +67,14 @@ const ProfileScreen = () => {
         {/* User Info Card */}
         <View style={styles.userCard}>
           <View style={styles.userInfo}>
-            <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
+            <Image source={{ uri: displayProfile.avatar }} style={styles.avatar} />
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{userProfile.name}</Text>
-              <Text style={styles.userEmail}>{userProfile.email}</Text>
+              <Text style={styles.userName}>{displayProfile.name}</Text>
+              <Text style={styles.userEmail}>{displayProfile.email}</Text>
               <View style={styles.userMeta}>
-                <Text style={styles.userType}>{userProfile.diabetesType}</Text>
+                <Text style={styles.userType}>{displayProfile.diabetesType}</Text>
                 <View style={styles.metaDivider} />
-                <Text style={styles.userBudget}>{userProfile.carbBudget}g carbs/day</Text>
+                <Text style={styles.userBudget}>{displayProfile.carbBudget}g carbs/day</Text>
               </View>
             </View>
           </View>
@@ -68,20 +83,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Stats Grid */}
-        <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Your Progress</Text>
-          <View style={styles.statsGrid}>
-            {stats.map((stat, index) => (
-              <View key={index} style={styles.statItem}>
-                <Text style={[styles.statValue, { color: stat.color }]}>
-                  {stat.value}
-                </Text>
-                <Text style={styles.statLabel}>{stat.label}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+
 
         {/* Achievements */}
         <View style={styles.achievementsCard}>
@@ -115,6 +117,74 @@ const ProfileScreen = () => {
           </View>
         </View>
 
+        {/* Onboarding Preferences */}
+        <View style={styles.preferencesCard}>
+          <View style={styles.preferencesHeader}>
+            <Text style={styles.preferencesTitle}>Your Preferences</Text>
+            <TouchableOpacity style={styles.editIconButton}>
+              <Edit3 size={16} color="#16A34A" />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Health Profile */}
+          <View style={styles.preferenceSection}>
+            <Text style={styles.sectionTitle}>Health Profile</Text>
+            <View style={styles.preferenceRow}>
+              <Text style={styles.preferenceLabel}>Diabetes Type:</Text>
+              <Text style={styles.preferenceValue}>{displayProfile.diabetesType || 'Not set'}</Text>
+            </View>
+            {displayProfile.age && (
+              <View style={styles.preferenceRow}>
+                <Text style={styles.preferenceLabel}>Age:</Text>
+                <Text style={styles.preferenceValue}>{displayProfile.age}</Text>
+              </View>
+            )}
+            <View style={styles.preferenceRow}>
+              <Text style={styles.preferenceLabel}>Daily Carb Budget:</Text>
+              <Text style={styles.preferenceValue}>{displayProfile.carbBudget ? `${displayProfile.carbBudget}g` : 'Not set'}</Text>
+            </View>
+          </View>
+
+          {/* Dietary Restrictions */}
+          {displayProfile.restrictions.length > 0 && (
+            <View style={styles.preferenceSection}>
+              <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
+              <View style={styles.tagsContainer}>
+                {displayProfile.restrictions.map((restriction, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{restriction}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Health Goals */}
+          {displayProfile.goals.length > 0 && (
+            <View style={styles.preferenceSection}>
+              <Text style={styles.sectionTitle}>Health Goals</Text>
+              <View style={styles.tagsContainer}>
+                {displayProfile.goals.map((goal, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{goal}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Cooking Experience */}
+          {displayProfile.cookingLevel && (
+            <View style={styles.preferenceSection}>
+              <Text style={styles.sectionTitle}>Cooking Experience</Text>
+              <View style={styles.preferenceRow}>
+                <Text style={styles.preferenceLabel}>Skill Level:</Text>
+                <Text style={styles.preferenceValue}>{displayProfile.cookingLevel}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
         {/* Menu Items */}
         <View style={styles.menuCard}>
           {menuItems.map((item, index) => {
@@ -143,7 +213,7 @@ const ProfileScreen = () => {
         {/* App Info */}
         <View style={styles.appInfo}>
           <Text style={styles.appInfoText}>ChefItUp v1.0.0</Text>
-          <Text style={styles.appInfoText}>Member since {userProfile.joinDate}</Text>
+          <Text style={styles.appInfoText}>Member since {displayProfile.joinDate}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -241,41 +311,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#ffffff',
   },
-  statsCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-    textAlign: 'center',
-  },
+
   achievementsCard: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
@@ -386,6 +422,75 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
+  },
+  // Preferences section styles
+  preferencesCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  preferencesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  preferencesTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+  },
+  editIconButton: {
+    padding: 8,
+  },
+  preferenceSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  preferenceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  preferenceLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+  },
+  preferenceValue: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#111827',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  tagText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#16A34A',
   },
 });
 

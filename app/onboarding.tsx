@@ -11,9 +11,13 @@ import {
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight, Heart, Clock, Target } from 'lucide-react-native';
+import { useUser } from '../contexts/UserContext';
+import { OnboardingData } from '../types/user';
 
 const OnboardingScreen = () => {
+  const { completeOnboarding } = useUser();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isCompleting, setIsCompleting] = useState(false);
   const [profile, setProfile] = useState({
     diabetesType: '',
     age: '',
@@ -28,12 +32,34 @@ const OnboardingScreen = () => {
   const goals = ['Better Blood Sugar Control', 'Weight Management', 'Save Time', 'Learn New Recipes'];
   const cookingLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
       // Complete onboarding
-      router.replace('/(tabs)');
+      setIsCompleting(true);
+      try {
+        const onboardingData: OnboardingData = {
+          diabetesType: profile.diabetesType,
+          age: profile.age,
+          carbBudget: profile.carbBudget,
+          restrictions: profile.restrictions,
+          goals: profile.goals,
+          cookingLevel: profile.cookingLevel,
+        };
+
+        const success = await completeOnboarding(onboardingData);
+        if (success) {
+          router.replace('/(tabs)');
+        } else {
+          Alert.alert('Error', 'Failed to save your profile. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+        Alert.alert('Error', 'Something went wrong. Please try again.');
+      } finally {
+        setIsCompleting(false);
+      }
     }
   };
 
@@ -81,6 +107,15 @@ const OnboardingScreen = () => {
           </Text>
         </TouchableOpacity>
       ))}
+
+      <Text style={styles.inputLabel}>Your Age</Text>
+      <TextInput
+        style={styles.textInput}
+        value={profile.age}
+        onChangeText={(text) => setProfile({ ...profile, age: text })}
+        placeholder="e.g., 35"
+        keyboardType="numeric"
+      />
     </View>
   );
 
@@ -197,7 +232,7 @@ const OnboardingScreen = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return profile.diabetesType !== '';
+        return profile.diabetesType !== '' && profile.age !== '';
       case 1:
         return profile.goals.length > 0;
       case 2:
@@ -238,13 +273,13 @@ const OnboardingScreen = () => {
             !canProceed() && styles.continueButtonDisabled,
           ]}
           onPress={handleNext}
-          disabled={!canProceed()}
+          disabled={!canProceed() || isCompleting}
         >
           <Text style={[
             styles.continueButtonText,
             !canProceed() && styles.continueButtonTextDisabled,
           ]}>
-            {currentStep === 3 ? 'Get Started' : 'Continue'}
+            {currentStep === 3 ? (isCompleting ? 'Saving...' : 'Get Started') : 'Continue'}
           </Text>
           <ChevronRight size={20} color={canProceed() ? '#ffffff' : '#9CA3AF'} />
         </TouchableOpacity>

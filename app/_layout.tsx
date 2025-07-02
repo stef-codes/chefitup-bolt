@@ -7,6 +7,7 @@ import { View, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Chrome, Home, Calendar, ShoppingCart, Target } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
+import { UserProvider } from '../contexts/UserContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,14 +46,16 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="dark" />
-      <Toast />
-    </View>
+    <UserProvider>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="dark" />
+        <Toast />
+      </View>
+    </UserProvider>
   );
 }

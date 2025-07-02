@@ -301,9 +301,10 @@ const ShoppingScreen = () => {
       return;
     }
 
-    const apiKey = process.env.INSTACART_API_KEY;
-    if (!apiKey) {
-      showToast({ message: 'Instacart API key not found.', backgroundColor: '#EF4444' });
+    // For now, we'll use a placeholder. In production, this should come from secure storage
+    const apiKey = 'your-instacart-api-key-here';
+    if (!apiKey || apiKey === 'your-instacart-api-key-here') {
+      showToast({ message: 'Please configure your Instacart API key.', backgroundColor: '#EF4444' });
       return;
     }
 

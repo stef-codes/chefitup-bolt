@@ -85,38 +85,6 @@ const ProfileScreen = () => {
 
 
 
-        {/* Achievements */}
-        <View style={styles.achievementsCard}>
-          <Text style={styles.achievementsTitle}>Achievements</Text>
-          <View style={styles.achievementsGrid}>
-            {achievements.map((achievement) => {
-              const IconComponent = achievement.icon;
-              return (
-                <View key={achievement.id} style={[
-                  styles.achievementItem,
-                  !achievement.earned && styles.achievementItemLocked
-                ]}>
-                  <View style={[
-                    styles.achievementIcon,
-                    achievement.earned && styles.achievementIconEarned
-                  ]}>
-                    <IconComponent 
-                      size={20} 
-                      color={achievement.earned ? '#16A34A' : '#9CA3AF'} 
-                    />
-                  </View>
-                  <Text style={[
-                    styles.achievementTitle,
-                    !achievement.earned && styles.achievementTitleLocked
-                  ]}>
-                    {achievement.title}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-
         {/* Onboarding Preferences */}
         <View style={styles.preferencesCard}>
           <View style={styles.preferencesHeader}>
@@ -183,6 +151,38 @@ const ProfileScreen = () => {
               </View>
             </View>
           )}
+        </View>
+
+        {/* Achievements */}
+        <View style={styles.achievementsCard}>
+          <Text style={styles.achievementsTitle}>Achievements</Text>
+          <View style={styles.achievementsGrid}>
+            {achievements.map((achievement) => {
+              const IconComponent = achievement.icon;
+              return (
+                <View key={achievement.id} style={[
+                  styles.achievementItem,
+                  !achievement.earned && styles.achievementItemLocked
+                ]}>
+                  <View style={[
+                    styles.achievementIcon,
+                    achievement.earned && styles.achievementIconEarned
+                  ]}>
+                    <IconComponent 
+                      size={20} 
+                      color={achievement.earned ? '#16A34A' : '#9CA3AF'} 
+                    />
+                  </View>
+                  <Text style={[
+                    styles.achievementTitle,
+                    !achievement.earned && styles.achievementTitleLocked
+                  ]}>
+                    {achievement.title}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
         </View>
 
         {/* Menu Items */}

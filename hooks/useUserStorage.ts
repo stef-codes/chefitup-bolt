@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { UserProfile, OnboardingData } from '../types/user';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 // Simple in-memory storage for Expo Go compatibility
 class MemoryStorage {
@@ -27,10 +29,54 @@ export const useUserStorage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
+  const { user } = useAuth();
 
   // Load user profile from storage
   const loadUserProfile = async (): Promise<UserProfile | null> => {
+    if (!user) return null;
+
     try {
+      // Try to load from Supabase first
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const profile: UserProfile = {
+          name: data.name || '',
+          email: data.email || '',
+          avatar: data.avatar || '',
+          diabetesType: data.diabetes_type || '',
+          age: data.age || '',
+          carbBudget: data.carb_budget || '',
+          restrictions: data.restrictions || [],
+          goals: data.goals || [],
+          cookingLevel: data.cooking_level || '',
+          joinDate: data.join_date || new Date().toISOString(),
+          preferences: data.preferences || {
+            notifications: true,
+            mealReminders: true,
+            carbTracking: true,
+            bloodSugarTracking: true,
+          },
+          stats: data.stats || {
+            mealsPrepped: 0,
+            recipesTried: 0,
+            streakDays: 0,
+            avgDailyCarbs: 0,
+          },
+        };
+
+        setUserProfile(profile);
+        setIsOnboardingCompleted(!!data.diabetes_type);
+        return profile;
+      }
+
+      // Fallback to local storage
       const storedProfile = await memoryStorage.getItem(USER_PROFILE_KEY);
       if (storedProfile) {
         return JSON.parse(storedProfile);
@@ -44,7 +90,32 @@ export const useUserStorage = () => {
 
   // Save user profile to storage
   const saveUserProfile = async (profile: UserProfile): Promise<boolean> => {
+    if (!user) return false;
+
     try {
+      // Save to Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          name: profile.name,
+          email: profile.email,
+          avatar: profile.avatar,
+          diabetes_type: profile.diabetesType,
+          age: profile.age,
+          carb_budget: profile.carbBudget,
+          restrictions: profile.restrictions,
+          goals: profile.goals,
+          cooking_level: profile.cookingLevel,
+          join_date: profile.joinDate,
+          preferences: profile.preferences,
+          stats: profile.stats,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      // Also save to local storage for offline access
       await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
       setUserProfile(profile);
       return true;
@@ -71,13 +142,15 @@ export const useUserStorage = () => {
 
   // Save onboarding data and mark as completed
   const completeOnboarding = async (onboardingData: OnboardingData): Promise<boolean> => {
+    if (!user) return false;
+
     try {
       const newProfile: UserProfile = {
-        name: 'Sarah Johnson', // Default name, can be updated later
-        email: 'sarah.johnson@email.com', // Default email, can be updated later
+        name: onboardingData.name || '',
+        email: user.email || '',
         avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
         ...onboardingData,
-        joinDate: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        joinDate: new Date().toISOString(),
         preferences: {
           notifications: true,
           mealReminders: true,
@@ -134,13 +207,18 @@ export const useUserStorage = () => {
     const initializeData = async () => {
       setIsLoading(true);
       try {
-        const [profile, onboardingStatus] = await Promise.all([
-          loadUserProfile(),
-          checkOnboardingStatus(),
-        ]);
-        
-        setUserProfile(profile);
-        setIsOnboardingCompleted(onboardingStatus);
+        if (user) {
+          const [profile, onboardingStatus] = await Promise.all([
+            loadUserProfile(),
+            checkOnboardingStatus(),
+          ]);
+          
+          setUserProfile(profile);
+          setIsOnboardingCompleted(onboardingStatus);
+        } else {
+          setUserProfile(null);
+          setIsOnboardingCompleted(false);
+        }
       } catch (error) {
         console.error('Error initializing user data:', error);
       } finally {
@@ -149,7 +227,7 @@ export const useUserStorage = () => {
     };
 
     initializeData();
-  }, []);
+  }, [user]);
 
   return {
     userProfile,

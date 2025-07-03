@@ -31,6 +31,7 @@ export interface UserProfile {
 }
 
 export interface OnboardingData {
+  name: string;
   diabetesType: string;
   age: string;
   carbBudget: string;

@@ -12,13 +12,21 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight, Heart, Clock, Target } from 'lucide-react-native';
 import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import { OnboardingData } from '../types/user';
+import { supabase } from '../lib/supabase';
+import Toast from 'react-native-toast-message';
 
-const OnboardingScreen = () => {
+const OnboardingScreen: React.FC = () => {
   const { completeOnboarding } = useUser();
+  const { signUp } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
   const [profile, setProfile] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
     diabetesType: '',
     age: '',
     carbBudget: '',
@@ -33,13 +41,31 @@ const OnboardingScreen = () => {
   const cookingLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
   const handleNext = async () => {
-    if (currentStep < 3) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     } else {
       // Complete onboarding
       setIsCompleting(true);
       try {
+
+        // First, create the user account
+        const { error: signUpError } = await signUp(profile.email, profile.password, {
+          name: profile.name,
+          diabetesType: profile.diabetesType,
+          age: profile.age,
+          carbBudget: profile.carbBudget,
+          restrictions: profile.restrictions,
+          goals: profile.goals,
+          cookingLevel: profile.cookingLevel,
+        });
+
+        if (signUpError) {
+          throw signUpError;
+        }
+
+        // Also save to local storage for offline access
         const onboardingData: OnboardingData = {
+          name: profile.name,
           diabetesType: profile.diabetesType,
           age: profile.age,
           carbBudget: profile.carbBudget,
@@ -48,15 +74,15 @@ const OnboardingScreen = () => {
           cookingLevel: profile.cookingLevel,
         };
 
-        const success = await completeOnboarding(onboardingData);
-        if (success) {
-          router.replace('/(tabs)');
-        } else {
-          Alert.alert('Error', 'Failed to save your profile. Please try again.');
-        }
+        await completeOnboarding(onboardingData);
+        router.replace('/');
       } catch (error) {
         console.error('Error completing onboarding:', error);
-        Alert.alert('Error', 'Something went wrong. Please try again.');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to save your profile. Please try again.',
+        });
       } finally {
         setIsCompleting(false);
       }
@@ -65,7 +91,7 @@ const OnboardingScreen = () => {
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
-      {[0, 1, 2, 3].map((step) => (
+      {[0, 1, 2, 3, 4, 5].map((step) => (
         <View
           key={step}
           style={[
@@ -84,9 +110,77 @@ const OnboardingScreen = () => {
           <Heart size={48} color="#16A34A" />
         </View>
       </View>
+      <Text style={styles.stepTitle}>Create Your Account</Text>
+      <Text style={styles.stepDescription}>
+        Let's get you started with ChefItUp
+      </Text>
+      
+      <Text style={styles.inputLabel}>Email Address</Text>
+      <TextInput
+        style={styles.textInput}
+        value={profile.email}
+        onChangeText={(text) => setProfile({ ...profile, email: text })}
+        placeholder="Enter your email"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+      />
+
+      <Text style={styles.inputLabel}>Password</Text>
+      <TextInput
+        style={styles.textInput}
+        value={profile.password}
+        onChangeText={(text) => setProfile({ ...profile, password: text })}
+        placeholder="Create a password"
+        secureTextEntry
+        autoComplete="new-password"
+      />
+
+      <Text style={styles.inputLabel}>Confirm Password</Text>
+      <TextInput
+        style={styles.textInput}
+        value={profile.confirmPassword}
+        onChangeText={(text) => setProfile({ ...profile, confirmPassword: text })}
+        placeholder="Confirm your password"
+        secureTextEntry
+        autoComplete="new-password"
+      />
+    </View>
+  );
+
+  const renderStep1 = () => (
+    <View style={styles.stepContainer}>
+      <View style={styles.iconContainer}>
+        <View>
+          <Heart size={48} color="#16A34A" />
+        </View>
+      </View>
       <Text style={styles.stepTitle}>Welcome to ChefItUp</Text>
       <Text style={styles.stepDescription}>
         Let's personalize your diabetes-friendly meal planning experience
+      </Text>
+      
+      <Text style={styles.inputLabel}>Your Name</Text>
+      <TextInput
+        style={styles.textInput}
+        value={profile.name}
+        onChangeText={(text) => setProfile({ ...profile, name: text })}
+        placeholder="Enter your name"
+        autoCapitalize="words"
+      />
+    </View>
+  );
+
+  const renderStep2 = () => (
+    <View style={styles.stepContainer}>
+      <View style={styles.iconContainer}>
+        <View>
+          <Heart size={48} color="#16A34A" />
+        </View>
+      </View>
+      <Text style={styles.stepTitle}>Diabetes Information</Text>
+      <Text style={styles.stepDescription}>
+        Help us understand your diabetes management needs
       </Text>
       
       <Text style={styles.sectionTitle}>What type of diabetes do you manage?</Text>
@@ -119,7 +213,7 @@ const OnboardingScreen = () => {
     </View>
   );
 
-  const renderStep1 = () => (
+  const renderStep3 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
         <View>
@@ -156,7 +250,7 @@ const OnboardingScreen = () => {
     </View>
   );
 
-  const renderStep2 = () => (
+  const renderStep4 = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Dietary Preferences</Text>
       <Text style={styles.stepDescription}>
@@ -197,7 +291,7 @@ const OnboardingScreen = () => {
     </View>
   );
 
-  const renderStep3 = () => (
+  const renderStep5 = () => (
     <View style={styles.stepContainer}>
       <View style={styles.iconContainer}>
         <View>
@@ -232,12 +326,16 @@ const OnboardingScreen = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return profile.diabetesType !== '' && profile.age !== '';
+        return profile.email !== '' && profile.password !== '' && profile.confirmPassword !== '' && profile.password === profile.confirmPassword;
       case 1:
-        return profile.goals.length > 0;
+        return profile.name !== '';
       case 2:
-        return profile.carbBudget !== '';
+        return profile.diabetesType !== '' && profile.age !== '';
       case 3:
+        return profile.goals.length > 0;
+      case 4:
+        return profile.carbBudget !== '';
+      case 5:
         return profile.cookingLevel !== '';
       default:
         return false;
@@ -254,6 +352,10 @@ const OnboardingScreen = () => {
         return renderStep2();
       case 3:
         return renderStep3();
+      case 4:
+        return renderStep4();
+      case 5:
+        return renderStep5();
       default:
         return renderStep0();
     }
@@ -279,7 +381,7 @@ const OnboardingScreen = () => {
             styles.continueButtonText,
             !canProceed() && styles.continueButtonTextDisabled,
           ]}>
-            {currentStep === 3 ? (isCompleting ? 'Saving...' : 'Get Started') : 'Continue'}
+            {currentStep === 5 ? (isCompleting ? 'Creating Account...' : 'Create Account') : 'Continue'}
           </Text>
           <ChevronRight size={20} color={canProceed() ? '#ffffff' : '#9CA3AF'} />
         </TouchableOpacity>

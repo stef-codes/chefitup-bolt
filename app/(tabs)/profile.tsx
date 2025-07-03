@@ -8,11 +8,13 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Target, TrendingUp, Bell, ChevronRight, Award, Calendar, Edit3 } from 'lucide-react-native';
+import { User, Settings, Heart, Target, TrendingUp, Bell, ChevronRight, Award, Calendar, Edit3, LogOut } from 'lucide-react-native';
 import { useUser } from '../../contexts/UserContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ProfileScreen = () => {
   const { userProfile, isLoading } = useUser();
+  const { signOut } = useAuth();
 
   // Fallback data if userProfile is not loaded yet
   const displayProfile = userProfile || {
@@ -49,11 +51,21 @@ const ProfileScreen = () => {
 
 
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      // The auth context will handle the redirect automatically
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   const menuItems = [
     { icon: Settings, title: 'Settings', subtitle: 'App preferences and notifications', action: () => {} },
     { icon: Heart, title: 'Health Profile', subtitle: 'Update diabetes and dietary info', action: () => {} },
     { icon: TrendingUp, title: 'Progress Report', subtitle: 'View detailed analytics', action: () => {} },
     { icon: Bell, title: 'Reminders', subtitle: 'Meal prep and eating reminders', action: () => {} },
+    { icon: LogOut, title: 'Sign Out', subtitle: 'Sign out of your account', action: handleSignOut },
   ];
 
   return (

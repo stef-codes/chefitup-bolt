@@ -7,9 +7,48 @@ import { View, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Chrome, Home, Calendar, ShoppingCart, Target } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { UserProvider } from '../contexts/UserContext';
 
 SplashScreen.preventAutoHideAsync();
+
+function RootLayoutNav() {
+  const { session, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      SplashScreen.hideAsync().catch(() => {
+        // Ignore splash screen errors
+      });
+    }
+  }, [loading]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+        <Text style={{ fontSize: 16, color: '#374151' }}>Loading...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <UserProvider>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="auth/sign-in" />
+          <Stack.Screen name="auth/sign-up" />
+          <Stack.Screen name="auth/forgot-password" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="dark" />
+        <Toast />
+      </View>
+    </UserProvider>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -18,14 +57,6 @@ export default function RootLayout() {
     'Inter-SemiBold': Inter_600SemiBold,
     'Inter-Bold': Inter_700Bold,
   });
-
-  useEffect(() => {
-    if (fontsLoaded && !fontError) {
-      SplashScreen.hideAsync().catch(() => {
-        // Ignore splash screen errors
-      });
-    }
-  }, [fontsLoaded, fontError]);
 
   // Show loading screen while fonts are loading
   if (!fontsLoaded && !fontError) {
@@ -46,16 +77,8 @@ export default function RootLayout() {
   }
 
   return (
-    <UserProvider>
-      <View style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="dark" />
-        <Toast />
-      </View>
-    </UserProvider>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }

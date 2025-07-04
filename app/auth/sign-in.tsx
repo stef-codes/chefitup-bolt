@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     fontFamily: 'Inter-Regular',
+    color: '#111827',
   },
   button: {
     backgroundColor: '#16A34A',
@@ -232,6 +233,12 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginBottom: 8,
   },
 });
 

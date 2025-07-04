@@ -7,6 +7,7 @@ import {
   TextInput,
   Alert,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,7 +27,15 @@ const OnboardingScreen: React.FC = () => {
   useEffect(() => {
   }, [currentStep]);
   
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<{
+    name: string;
+    diabetesType: string;
+    age: string;
+    carbBudget: string;
+    restrictions: string[];
+    goals: string[];
+    cookingLevel: string;
+  }>({
     name: '',
     diabetesType: '',
     age: '',
@@ -36,10 +45,10 @@ const OnboardingScreen: React.FC = () => {
     cookingLevel: '',
   });
 
-  const diabetesTypes = ['Type 1', 'Type 2', 'Pre-diabetes', 'Gestational'];
-  const restrictions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Low-Sodium', 'Heart-Healthy'];
-  const goals = ['Better Blood Sugar Control', 'Weight Management', 'Save Time', 'Learn New Recipes'];
-  const cookingLevels = ['Beginner', 'Intermediate', 'Advanced'];
+  const diabetesTypes: string[] = ['Type 1', 'Type 2', 'Pre-diabetes', 'Gestational'];
+  const restrictions: string[] = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Low-Sodium', 'Heart-Healthy'];
+  const goals: string[] = ['Better Blood Sugar Control', 'Weight Management', 'Save Time', 'Learn New Recipes'];
+  const cookingLevels: string[] = ['Beginner', 'Intermediate', 'Advanced'];
 
   const goToNextStep = () => {
     if (currentStep < 4 && canProceed()) {
@@ -330,15 +339,12 @@ const OnboardingScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {renderStepIndicator()}
         {renderCurrentStep()}
-      </View>
-      
+      </ScrollView>
       <View style={styles.footer}>
         <View style={styles.footerContent}>
-          
-          
           {currentStep > 0 && (
             <TouchableOpacity
               style={styles.backButton}
@@ -348,7 +354,6 @@ const OnboardingScreen: React.FC = () => {
               <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
           )}
-          
           <TouchableOpacity
             style={[
               styles.continueButton,
@@ -382,7 +387,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingBottom: 100,
+    paddingBottom: 160,
   },
   gestureContainer: {
     flex: 1,

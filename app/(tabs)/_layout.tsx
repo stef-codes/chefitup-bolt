@@ -2,9 +2,11 @@ import { Tabs } from 'expo-router';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { Chrome, Home, Calendar, ShoppingCart, Target, User } from 'lucide-react-native';
 import { useProfileMenu } from '../../contexts/ProfileMenuContext';
+import { useRouter } from 'expo-router';
 
 export default function TabLayout() {
   const { showProfileMenu, setShowProfileMenu, handleSignOut } = useProfileMenu();
+  const router = useRouter();
 
   return (
     <View style={{ flex: 1 }}>
@@ -47,7 +49,7 @@ export default function TabLayout() {
               }}
               onPress={() => {
                 setShowProfileMenu(false);
-                // Navigate to profile screen
+                router.push('/profile');
               }}
             >
               <User size={20} color="#16A34A" />

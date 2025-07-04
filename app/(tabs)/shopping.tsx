@@ -343,7 +343,6 @@ const ShoppingScreen = () => {
         message: `Copied ${shoppingList.length} items to clipboard!`, 
         backgroundColor: '#16A34A' 
       });
-      console.log('Shopping list copied to clipboard:', shoppingListText);
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       showToast({ message: 'Failed to copy to clipboard.', backgroundColor: '#EF4444' });
@@ -375,14 +374,6 @@ const ShoppingScreen = () => {
         fromMealPlan: shoppingList.some(item => item.fromMealPlan)
       };
 
-      // Log the complete shopping list data
-      console.log('=== SHOPPING LIST DATA ===');
-      console.log('Total Items:', shoppingListData.totalItems);
-      console.log('Categories:', shoppingListData.categories);
-      console.log('From Meal Plan:', shoppingListData.fromMealPlan);
-      console.log('Items:', shoppingListData.items);
-      console.log('================================================');
-
       // Simulate API call delay
       setTimeout(async () => {
         try {
@@ -395,12 +386,6 @@ const ShoppingScreen = () => {
           const itemNames = shoppingListData.items.map(item => item.name);
           const searchQuery = encodeURIComponent(itemNames.slice(0, 5).join(' '));
           
-          // Log the shopping list in a readable format
-          console.log('=== SHOPPING LIST FOR INSTACART ===');
-          console.log(shoppingListText);
-          console.log('Search Query:', searchQuery);
-          console.log('===================================');
-          
           // Copy shopping list to clipboard first
           await copyShoppingListToClipboard();
           
@@ -411,7 +396,6 @@ const ShoppingScreen = () => {
             
             if (apiKey && apiKey !== 'your_instacart_api_key_here') {
               // Real API integration attempt using the correct endpoint
-              console.log('Attempting to send shopping list to Instacart API...');
               
               // Prepare the API payload according to the correct format
               const apiPayload = {
@@ -445,7 +429,6 @@ const ShoppingScreen = () => {
                 }
               };
               
-              console.log('API Payload:', JSON.stringify(apiPayload, null, 2));
               
               const apiResponse = await fetch('https://connect.dev.instacart.tools/idp/v1/products/products_link', {
                 method: 'POST',
@@ -457,12 +440,9 @@ const ShoppingScreen = () => {
                 body: JSON.stringify(apiPayload)
               });
               
-              console.log('API Response Status:', apiResponse.status);
-              console.log('API Response Headers:', Object.fromEntries(apiResponse.headers.entries()));
               
               if (apiResponse.ok) {
                 const responseData = await apiResponse.json();
-                console.log('Successfully sent shopping list to Instacart API:', responseData);
                 
                 // Check if the response contains a link to open
                 if (responseData.link_url) {
@@ -473,7 +453,6 @@ const ShoppingScreen = () => {
                   
                   // Open the specific link from Instacart
                   await Linking.openURL(responseData.link_url);
-                  console.log('Opened Instacart with specific link:', responseData.link_url);
                 } else {
                   showToast({ 
                     message: `Shopping list sent to Instacart! Opening app...`, 
@@ -504,24 +483,20 @@ const ShoppingScreen = () => {
               }
             } else {
               // Fallback: Open Instacart with search query
-              console.log('No API key available, using search query fallback');
               const instacartSearchUrl = `https://www.instacart.com/store/search?query=${searchQuery}`;
               
               const canOpen = await Linking.canOpenURL(instacartSearchUrl);
               if (canOpen) {
                 await Linking.openURL(instacartSearchUrl);
-                console.log('Opened Instacart with search query:', instacartSearchUrl);
               } else {
                 // Fallback to main Instacart site
                 await Linking.openURL('https://www.instacart.com');
-                console.log('Opened main Instacart site as fallback');
               }
             }
           } catch (error) {
             console.error('Error sending to Instacart:', error);
             // Fallback to main Instacart site
             await Linking.openURL('https://www.instacart.com');
-            console.log('Opened main Instacart site as fallback');
           }
           
           // Show success message
@@ -617,6 +592,15 @@ const ShoppingScreen = () => {
               </Text>
             </TouchableOpacity>
             
+            <TouchableOpacity 
+              style={[styles.quickActionButton, styles.planButton]}
+              onPress={() => router.replace('/meal-plan')}
+            >
+              <View>
+                <Calendar size={18} color="#16A34A" />
+              </View>
+              <Text style={styles.planButtonText}>Plan This Week</Text>
+            </TouchableOpacity>
 
             
             <TouchableOpacity 
@@ -1117,6 +1101,16 @@ const styles = StyleSheet.create({
   profileAvatar: {
     width: '100%',
     height: '100%',
+  },
+  planButton: {
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  planButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#3B82F6',
   },
 });
 

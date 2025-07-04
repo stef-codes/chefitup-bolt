@@ -24,7 +24,6 @@ const OnboardingScreen: React.FC = () => {
   
   // Monitor currentStep changes
   useEffect(() => {
-    console.log('=== currentStep changed to:', currentStep, '===');
   }, [currentStep]);
   
   const [profile, setProfile] = useState({
@@ -55,18 +54,10 @@ const OnboardingScreen: React.FC = () => {
   };
 
   const handleNext = async () => {
-    console.log('=== handleNext called ===');
-    console.log('Current step:', currentStep);
-    console.log('Profile state:', profile);
-    console.log('Can proceed:', canProceed());
-    
     if (currentStep < 4) {
       const nextStep = currentStep + 1;
-      console.log('Moving to next step:', nextStep);
       setCurrentStep(nextStep);
-      console.log('setCurrentStep called with:', nextStep);
     } else {
-      console.log('Completing onboarding...');
       // Complete onboarding
       setIsCompleting(true);
       try {
@@ -82,14 +73,11 @@ const OnboardingScreen: React.FC = () => {
           cookingLevel: profile.cookingLevel,
         };
 
-        console.log('Calling completeOnboarding with data:', onboardingData);
         const success = await completeOnboarding(onboardingData);
         
         if (success) {
-          console.log('Onboarding completed successfully');
           router.replace('/(tabs)');
         } else {
-          console.error('Failed to complete onboarding');
           Toast.show({
             type: 'error',
             text1: 'Error',
@@ -97,7 +85,6 @@ const OnboardingScreen: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error('Error completing onboarding:', error);
         Toast.show({
           type: 'error',
           text1: 'Error',
@@ -142,7 +129,6 @@ const OnboardingScreen: React.FC = () => {
         style={styles.textInput}
         value={profile.name}
         onChangeText={(text) => {
-          console.log('Name input changed to:', `"${text}"`);
           setProfile({ ...profile, name: text });
         }}
         placeholder="Enter your name"
@@ -307,7 +293,6 @@ const OnboardingScreen: React.FC = () => {
     // Simple direct check for step 0
     if (currentStep === 0) {
       const hasName = profile.name && profile.name.trim().length > 0;
-      console.log('Step 0 - Name:', `"${profile.name}"`, 'Has name:', hasName);
       return hasName;
     }
     
@@ -352,15 +337,7 @@ const OnboardingScreen: React.FC = () => {
       
       <View style={styles.footer}>
         <View style={styles.footerContent}>
-          {/* Debug indicator */}
-          <Text style={{ fontSize: 12, color: 'blue', position: 'absolute', top: -30, left: 0 }}>
-            Step: {currentStep} | Name: "{profile.name}" | Can proceed: {canProceed().toString()}
-          </Text>
           
-          {/* Additional debug info */}
-          <Text style={{ fontSize: 10, color: 'green', position: 'absolute', top: -50, left: 0 }}>
-            Profile state: {JSON.stringify(profile)}
-          </Text>
           
           {currentStep > 0 && (
             <TouchableOpacity
@@ -379,7 +356,6 @@ const OnboardingScreen: React.FC = () => {
               !canProceed() && styles.continueButtonDisabled,
             ]}
             onPress={() => {
-              console.log('Button pressed! Step:', currentStep, 'Can proceed:', canProceed());
               handleNext();
             }}
             disabled={!canProceed() || isCompleting}

@@ -12,10 +12,21 @@ import {
   Clipboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Plus, Trash2, ShoppingCart, RefreshCw, Calendar, ExternalLink } from 'lucide-react-native';
+import { 
+  ShoppingCart, 
+  Plus, 
+  Check, 
+  Trash2, 
+  Calendar, 
+  RefreshCw,
+  Copy,
+  ExternalLink,
+  User,
+} from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { showToast } from '../../utils/toast';
+import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 
 type ShoppingListItem = {
   id: number;
@@ -27,6 +38,7 @@ type ShoppingListItem = {
 };
 
 const ShoppingScreen = () => {
+  const { handleProfilePress } = useProfileMenu();
   const [newItem, setNewItem] = useState('');
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -530,18 +542,6 @@ const ShoppingScreen = () => {
     }
   };
 
-  // Add userProfile and handleProfilePress
-  const userProfile = {
-    name: 'Sarah Johnson',
-    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
-  };
-  const handleProfilePress = () => {
-    // @ts-ignore
-    if (typeof router !== 'undefined') {
-      router.push('/(tabs)/profile');
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.mainScrollView} showsVerticalScrollIndicator={false}>
@@ -551,16 +551,14 @@ const ShoppingScreen = () => {
             <Text style={styles.title}>Shopping List</Text>
             {/* Add any subtitle if needed */}
           </View>
+          
+          {/* Profile Icon */}
           <TouchableOpacity 
             style={styles.profileIcon}
             onPress={handleProfilePress}
             activeOpacity={0.7}
           >
-            <Image 
-              source={{ uri: userProfile.avatar }} 
-              style={styles.profileAvatar}
-              resizeMode="cover"
-            />
+            <User size={24} color="#16A34A" />
           </TouchableOpacity>
         </View>
 
@@ -776,7 +774,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 40,
     marginBottom: 20,
   },
   title: {
@@ -1109,20 +1107,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   profileIcon: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    transform: [{ scale: 1 }],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: '100%',
+    height: '100%',
   },
 });
 

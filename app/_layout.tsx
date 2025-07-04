@@ -9,6 +9,8 @@ import { Chrome, Home, Calendar, ShoppingCart, Target } from 'lucide-react-nativ
 import Toast from 'react-native-toast-message';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { UserProvider } from '../contexts/UserContext';
+import { ProfileMenuProvider } from '../contexts/ProfileMenuContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,9 +40,11 @@ function RootLayoutNav() {
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="profile" />
           <Stack.Screen name="auth/sign-in" />
           <Stack.Screen name="auth/sign-up" />
           <Stack.Screen name="auth/forgot-password" />
+          <Stack.Screen name="auth/callback" />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="dark" />
@@ -77,8 +81,12 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <ProfileMenuProvider>
+          <RootLayoutNav />
+        </ProfileMenuProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

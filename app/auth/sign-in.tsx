@@ -18,7 +18,8 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { signIn, signInWithGoogle } = useAuth();
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -38,6 +39,28 @@ const SignIn = () => {
       });
     } else {
       router.replace('/');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        Toast.show({
+          type: 'error',
+          text1: 'Google Sign In Failed',
+          text2: error.message || 'Failed to sign in with Google',
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Google Sign In Failed',
+        text2: 'An unexpected error occurred',
+      });
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -77,6 +100,24 @@ const SignIn = () => {
           >
             <Text style={styles.buttonText}>
               {loading ? 'Signing In...' : 'Sign In'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Google Sign-in Button */}
+          <TouchableOpacity
+            style={[styles.googleButton, googleLoading && styles.buttonDisabled]}
+            onPress={handleGoogleSignIn}
+            disabled={googleLoading}
+          >
+            <Text style={styles.googleButtonText}>
+              {googleLoading ? 'Signing in...' : 'Continue with Google'}
             </Text>
           </TouchableOpacity>
 
@@ -163,6 +204,34 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 16,
     fontFamily: 'Inter-Regular',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#D1D5DB',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    color: '#6B7280',
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+  },
+  googleButton: {
+    backgroundColor: '#4285F4',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  googleButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
   },
 });
 

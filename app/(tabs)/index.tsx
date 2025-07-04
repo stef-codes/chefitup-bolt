@@ -16,6 +16,7 @@ import RecipeDetailModal from '../../components/RecipeDetailModal';
 import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import { showToast } from '../../utils/toast';
+import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 
 interface Recipe {
   id: number;
@@ -52,6 +53,7 @@ interface BloodSugarReading {
 }
 
 const HomeScreen = () => {
+  const { handleProfilePress } = useProfileMenu();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -290,10 +292,6 @@ const HomeScreen = () => {
     router.push('/(tabs)/recipes');
   };
 
-  const handleProfilePress = () => {
-    router.push('/(tabs)/profile');
-  };
-
   const handleEditCarbs = () => {
     setIsEditingCarbs(true);
     setEditingCarbValue(todayStats.carbsConsumed.toString());
@@ -361,17 +359,13 @@ const HomeScreen = () => {
               <Text style={styles.greeting}>{getGreeting()}</Text>
             </View>
             
-            {/* Simple Profile Icon */}
+            {/* Profile Icon */}
             <TouchableOpacity 
               style={styles.profileIcon}
               onPress={handleProfilePress}
               activeOpacity={0.7}
             >
-              <Image 
-                source={{ uri: userProfile.avatar }} 
-                style={styles.profileAvatar}
-                resizeMode="cover"
-              />
+              <User size={24} color="#16A34A" />
             </TouchableOpacity>
           </View>
         </View>
@@ -659,22 +653,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
-  },
-  profileIcon: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    transform: [{ scale: 1 }],
-  },
-  profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
   },
   carbProgressCard: {
     backgroundColor: '#ffffff',
@@ -975,6 +953,18 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+  },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileAvatar: {
+    width: '100%',
+    height: '100%',
   },
 });
 

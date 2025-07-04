@@ -24,10 +24,12 @@ import {
   Search,
   Edit3,
   Trash2,
+  User,
 } from 'lucide-react-native';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import CustomMealModal from '../../components/CustomMealModal';
 import { useRouter } from 'expo-router';
+import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 
 interface NutritionEntry {
   id: number;
@@ -65,6 +67,8 @@ interface FoodItem {
 }
 
 const NutritionScreen = () => {
+  const { handleProfilePress } = useProfileMenu();
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyEntries, setDailyEntries] = useState<NutritionEntry[]>([]);
   const [bloodSugarReadings, setBloodSugarReadings] = useState<BloodSugarReading[]>([]);
@@ -277,20 +281,6 @@ const NutritionScreen = () => {
     ? todaysBloodSugarReadings[todaysBloodSugarReadings.length - 1] 
     : null;
 
-  const router = useRouter();
-
-  const userProfile = {
-    name: 'Sarah Johnson',
-    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
-  };
-
-  const handleProfilePress = () => {
-    // @ts-ignore
-    if (typeof router !== 'undefined') {
-      router.push('/(tabs)/profile');
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -300,16 +290,14 @@ const NutritionScreen = () => {
             <Text style={styles.title}>Nutrition</Text>
             {/* Add any subtitle if needed */}
           </View>
+          
+          {/* Profile Icon */}
           <TouchableOpacity 
             style={styles.profileIcon}
             onPress={handleProfilePress}
             activeOpacity={0.7}
           >
-            <Image 
-              source={{ uri: userProfile.avatar }} 
-              style={styles.profileAvatar}
-              resizeMode="cover"
-            />
+            <User size={24} color="#16A34A" />
           </TouchableOpacity>
         </View>
         {/* Date Navigation */}
@@ -761,7 +749,7 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 20,
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 40,
   },
   title: {
     fontSize: 32,
@@ -1367,20 +1355,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   profileIcon: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    transform: [{ scale: 1 }],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: '100%',
+    height: '100%',
   },
 });
 

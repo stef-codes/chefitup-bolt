@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,13 +19,15 @@ import Toast from 'react-native-toast-message';
 
 const OnboardingScreen: React.FC = () => {
   const { completeOnboarding } = useUser();
-  const { signUp } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
+  
+  // Monitor currentStep changes
+  useEffect(() => {
+    console.log('=== currentStep changed to:', currentStep, '===');
+  }, [currentStep]);
+  
   const [profile, setProfile] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
     name: '',
     diabetesType: '',
     age: '',
@@ -40,30 +42,36 @@ const OnboardingScreen: React.FC = () => {
   const goals = ['Better Blood Sugar Control', 'Weight Management', 'Save Time', 'Learn New Recipes'];
   const cookingLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
-  const handleNext = async () => {
-    if (currentStep < 5) {
+  const goToNextStep = () => {
+    if (currentStep < 4 && canProceed()) {
       setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const goToPreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleNext = async () => {
+    console.log('=== handleNext called ===');
+    console.log('Current step:', currentStep);
+    console.log('Profile state:', profile);
+    console.log('Can proceed:', canProceed());
+    
+    if (currentStep < 4) {
+      const nextStep = currentStep + 1;
+      console.log('Moving to next step:', nextStep);
+      setCurrentStep(nextStep);
+      console.log('setCurrentStep called with:', nextStep);
     } else {
+      console.log('Completing onboarding...');
       // Complete onboarding
       setIsCompleting(true);
       try {
 
-        // First, create the user account
-        const { error: signUpError } = await signUp(profile.email, profile.password, {
-          name: profile.name,
-          diabetesType: profile.diabetesType,
-          age: profile.age,
-          carbBudget: profile.carbBudget,
-          restrictions: profile.restrictions,
-          goals: profile.goals,
-          cookingLevel: profile.cookingLevel,
-        });
-
-        if (signUpError) {
-          throw signUpError;
-        }
-
-        // Also save to local storage for offline access
+        // Save profile to local storage for offline access
         const onboardingData: OnboardingData = {
           name: profile.name,
           diabetesType: profile.diabetesType,
@@ -74,8 +82,20 @@ const OnboardingScreen: React.FC = () => {
           cookingLevel: profile.cookingLevel,
         };
 
-        await completeOnboarding(onboardingData);
-        router.replace('/');
+        console.log('Calling completeOnboarding with data:', onboardingData);
+        const success = await completeOnboarding(onboardingData);
+        
+        if (success) {
+          console.log('Onboarding completed successfully');
+          router.replace('/(tabs)');
+        } else {
+          console.error('Failed to complete onboarding');
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Failed to save your profile. Please try again.',
+          });
+        }
       } catch (error) {
         console.error('Error completing onboarding:', error);
         Toast.show({
@@ -91,7 +111,7 @@ const OnboardingScreen: React.FC = () => {
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
-      {[0, 1, 2, 3, 4, 5].map((step) => (
+      {[0, 1, 2, 3, 4].map((step) => (
         <View
           key={step}
           style={[
@@ -103,50 +123,7 @@ const OnboardingScreen: React.FC = () => {
     </View>
   );
 
-  const renderStep0 = () => (
-    <View style={styles.stepContainer}>
-      <View style={styles.iconContainer}>
-        <View>
-          <Heart size={48} color="#16A34A" />
-        </View>
-      </View>
-      <Text style={styles.stepTitle}>Create Your Account</Text>
-      <Text style={styles.stepDescription}>
-        Let's get you started with ChefItUp
-      </Text>
-      
-      <Text style={styles.inputLabel}>Email Address</Text>
-      <TextInput
-        style={styles.textInput}
-        value={profile.email}
-        onChangeText={(text) => setProfile({ ...profile, email: text })}
-        placeholder="Enter your email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoComplete="email"
-      />
 
-      <Text style={styles.inputLabel}>Password</Text>
-      <TextInput
-        style={styles.textInput}
-        value={profile.password}
-        onChangeText={(text) => setProfile({ ...profile, password: text })}
-        placeholder="Create a password"
-        secureTextEntry
-        autoComplete="new-password"
-      />
-
-      <Text style={styles.inputLabel}>Confirm Password</Text>
-      <TextInput
-        style={styles.textInput}
-        value={profile.confirmPassword}
-        onChangeText={(text) => setProfile({ ...profile, confirmPassword: text })}
-        placeholder="Confirm your password"
-        secureTextEntry
-        autoComplete="new-password"
-      />
-    </View>
-  );
 
   const renderStep1 = () => (
     <View style={styles.stepContainer}>
@@ -164,7 +141,10 @@ const OnboardingScreen: React.FC = () => {
       <TextInput
         style={styles.textInput}
         value={profile.name}
-        onChangeText={(text) => setProfile({ ...profile, name: text })}
+        onChangeText={(text) => {
+          console.log('Name input changed to:', `"${text}"`);
+          setProfile({ ...profile, name: text });
+        }}
         placeholder="Enter your name"
         autoCapitalize="words"
       />
@@ -324,18 +304,22 @@ const OnboardingScreen: React.FC = () => {
   );
 
   const canProceed = () => {
+    // Simple direct check for step 0
+    if (currentStep === 0) {
+      const hasName = profile.name && profile.name.trim().length > 0;
+      console.log('Step 0 - Name:', `"${profile.name}"`, 'Has name:', hasName);
+      return hasName;
+    }
+    
+    // Other steps
     switch (currentStep) {
-      case 0:
-        return profile.email !== '' && profile.password !== '' && profile.confirmPassword !== '' && profile.password === profile.confirmPassword;
       case 1:
-        return profile.name !== '';
-      case 2:
         return profile.diabetesType !== '' && profile.age !== '';
-      case 3:
+      case 2:
         return profile.goals.length > 0;
-      case 4:
+      case 3:
         return profile.carbBudget !== '';
-      case 5:
+      case 4:
         return profile.cookingLevel !== '';
       default:
         return false;
@@ -345,46 +329,70 @@ const OnboardingScreen: React.FC = () => {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
-        return renderStep0();
-      case 1:
         return renderStep1();
-      case 2:
+      case 1:
         return renderStep2();
-      case 3:
+      case 2:
         return renderStep3();
-      case 4:
+      case 3:
         return renderStep4();
-      case 5:
+      case 4:
         return renderStep5();
       default:
-        return renderStep0();
+        return renderStep1();
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {renderStepIndicator()}
         {renderCurrentStep()}
-      </ScrollView>
+      </View>
       
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[
-            styles.continueButton,
-            !canProceed() && styles.continueButtonDisabled,
-          ]}
-          onPress={handleNext}
-          disabled={!canProceed() || isCompleting}
-        >
-          <Text style={[
-            styles.continueButtonText,
-            !canProceed() && styles.continueButtonTextDisabled,
-          ]}>
-            {currentStep === 5 ? (isCompleting ? 'Creating Account...' : 'Create Account') : 'Continue'}
+        <View style={styles.footerContent}>
+          {/* Debug indicator */}
+          <Text style={{ fontSize: 12, color: 'blue', position: 'absolute', top: -30, left: 0 }}>
+            Step: {currentStep} | Name: "{profile.name}" | Can proceed: {canProceed().toString()}
           </Text>
-          <ChevronRight size={20} color={canProceed() ? '#ffffff' : '#9CA3AF'} />
-        </TouchableOpacity>
+          
+          {/* Additional debug info */}
+          <Text style={{ fontSize: 10, color: 'green', position: 'absolute', top: -50, left: 0 }}>
+            Profile state: {JSON.stringify(profile)}
+          </Text>
+          
+          {currentStep > 0 && (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={goToPreviousStep}
+              disabled={isCompleting}
+            >
+              <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
+          )}
+          
+          <TouchableOpacity
+            style={[
+              styles.continueButton,
+              { marginLeft: currentStep > 0 ? 16 : 0 },
+              !canProceed() && styles.continueButtonDisabled,
+            ]}
+            onPress={() => {
+              console.log('Button pressed! Step:', currentStep, 'Can proceed:', canProceed());
+              handleNext();
+            }}
+            disabled={!canProceed() || isCompleting}
+          >
+            <Text style={[
+              styles.continueButtonText,
+              !canProceed() && styles.continueButtonTextDisabled,
+            ]}>
+              {currentStep === 4 ? (isCompleting ? 'Saving...' : 'Get Started') : 'Continue'}
+            </Text>
+            <ChevronRight size={20} color={canProceed() ? '#ffffff' : '#9CA3AF'} />
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -395,9 +403,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  scrollView: {
+  content: {
     flex: 1,
     paddingHorizontal: 24,
+    paddingBottom: 100,
+  },
+  gestureContainer: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
   },
   stepIndicator: {
     flexDirection: 'row',
@@ -420,7 +435,8 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flex: 1,
-    paddingBottom: 100,
+    paddingHorizontal: 0,
+    paddingBottom: 0,
   },
   iconContainer: {
     alignItems: 'center',
@@ -485,6 +501,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#111827',
   },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginHorizontal: 10,
+  },
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -495,6 +527,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
+  footerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+  },
   continueButton: {
     backgroundColor: '#16A34A',
     borderRadius: 12,
@@ -502,6 +548,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   continueButtonDisabled: {
     backgroundColor: '#F3F4F6',

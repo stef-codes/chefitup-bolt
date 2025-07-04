@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Image,
+  TextInput,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Filter, Clock, Users, Heart } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Search, Filter, Heart, Clock, Users, User } from 'lucide-react-native';
 import RecipeDetailModal from '../../components/RecipeDetailModal';
-import { useRouter } from 'expo-router';
+import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 
 interface Recipe {
   id: number;
@@ -30,11 +31,12 @@ interface Recipe {
 }
 
 const RecipesScreen = () => {
+  const { handleProfilePress } = useProfileMenu();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const router = useRouter();
+  const { isProfileMenuVisible, toggleProfileMenu } = useProfileMenu();
 
   const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Low-Carb', 'High-Protein'];
 
@@ -794,23 +796,11 @@ const RecipesScreen = () => {
   };
 
   const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
-    // Here you would typically save this to your app's state management or backend
     Alert.alert(
-      'Added to Meal Plan!',
+      'Added to Meal Plan',
       `${recipe.name} has been added to ${day} ${mealType}`,
       [{ text: 'OK' }]
     );
-  };
-
-  const userProfile = {
-    name: 'Sarah Johnson',
-    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
-  };
-  const handleProfilePress = () => {
-    // @ts-ignore
-    if (typeof router !== 'undefined') {
-      router.push('/(tabs)/profile');
-    }
   };
 
   return (
@@ -819,16 +809,14 @@ const RecipesScreen = () => {
         <View>
           <Text style={styles.title}>Recipes</Text>
         </View>
+        
+        {/* Profile Icon */}
         <TouchableOpacity 
           style={styles.profileIcon}
           onPress={handleProfilePress}
           activeOpacity={0.7}
         >
-          <Image 
-            source={{ uri: userProfile.avatar }} 
-            style={styles.profileAvatar}
-            resizeMode="cover"
-          />
+          <User size={24} color="#16A34A" />
         </TouchableOpacity>
       </View>
 
@@ -1161,20 +1149,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   profileIcon: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    transform: [{ scale: 1 }],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: '100%',
+    height: '100%',
   },
 });
 

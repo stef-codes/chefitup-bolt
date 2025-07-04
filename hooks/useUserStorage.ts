@@ -90,9 +90,16 @@ export const useUserStorage = () => {
 
   // Save user profile to storage
   const saveUserProfile = async (profile: UserProfile): Promise<boolean> => {
-    if (!user) return false;
+    console.log('saveUserProfile called with profile:', profile);
+    console.log('Current user:', user);
+    
+    if (!user) {
+      console.error('No user found during profile save');
+      return false;
+    }
 
     try {
+      console.log('Attempting to save to Supabase...');
       // Save to Supabase
       const { error } = await supabase
         .from('profiles')
@@ -113,14 +120,28 @@ export const useUserStorage = () => {
           updated_at: new Date().toISOString(),
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        
+        // Fallback: save to local storage only
+        console.log('Falling back to local storage only...');
+        await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+        setUserProfile(profile);
+        console.log('Profile saved to local storage as fallback');
+        return true; // Return true even if Supabase failed
+      }
+
+      console.log('Profile saved to Supabase successfully');
 
       // Also save to local storage for offline access
       await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
       setUserProfile(profile);
+      console.log('Profile saved to local storage successfully');
       return true;
     } catch (error) {
       console.error('Error saving user profile:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       return false;
     }
   };
@@ -142,7 +163,13 @@ export const useUserStorage = () => {
 
   // Save onboarding data and mark as completed
   const completeOnboarding = async (onboardingData: OnboardingData): Promise<boolean> => {
-    if (!user) return false;
+    console.log('completeOnboarding called with data:', onboardingData);
+    console.log('Current user:', user);
+    
+    if (!user) {
+      console.error('No user found during onboarding completion');
+      return false;
+    }
 
     try {
       const newProfile: UserProfile = {
@@ -165,14 +192,21 @@ export const useUserStorage = () => {
         },
       };
 
+      console.log('Attempting to save profile:', newProfile);
       const success = await saveUserProfile(newProfile);
+      
       if (success) {
+        console.log('Profile saved successfully, marking onboarding as completed');
         await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
         setIsOnboardingCompleted(true);
+      } else {
+        console.error('Failed to save user profile');
       }
+      
       return success;
     } catch (error) {
       console.error('Error completing onboarding:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       return false;
     }
   };

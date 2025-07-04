@@ -7,11 +7,21 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  SafeAreaView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Calendar, ChefHat, Shuffle } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Calendar, 
+  Clock, 
+  Users, 
+  Shuffle, 
+  Plus,
+  User,
+} from 'lucide-react-native';
 import MealPlanCustomizationModal from '../../components/MealPlanCustomizationModal';
+import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 import { showToast } from '../../utils/toast';
 
 interface Recipe {
@@ -36,15 +46,13 @@ interface MealPlan {
 }
 
 const userProfile = {
-  name: 'Sarah Johnson',
+  name: 'Stef',
+  email: 'stef@example.com',
   avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
 };
 
-const handleProfilePress = () => {
-  router.push('/(tabs)/profile');
-};
-
 const MealPlanScreen = () => {
+  const { handleProfilePress } = useProfileMenu();
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedDay, setSelectedDay] = useState(0);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -615,16 +623,14 @@ const MealPlanScreen = () => {
             <Text style={styles.title}>Meal Plan</Text>
             <Text style={styles.subtitle}>Your weekly diabetes-friendly menu</Text>
           </View>
+          
+          {/* Profile Icon */}
           <TouchableOpacity 
             style={styles.profileIcon}
             onPress={handleProfilePress}
             activeOpacity={0.7}
           >
-            <Image 
-              source={{ uri: userProfile.avatar }} 
-              style={styles.profileAvatar}
-              resizeMode="cover"
-            />
+            <User size={24} color="#16A34A" />
           </TouchableOpacity>
         </View>
 
@@ -926,6 +932,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
+    paddingTop: 40,
   },
   title: {
     fontSize: 32,
@@ -1325,20 +1332,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   profileIcon: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    transform: [{ scale: 1 }],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: '100%',
+    height: '100%',
   },
 });
 

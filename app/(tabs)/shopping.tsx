@@ -592,15 +592,7 @@ const ShoppingScreen = () => {
               </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity 
-              style={[styles.quickActionButton, styles.planButton]}
-              onPress={() => router.replace('/meal-plan')}
-            >
-              <View>
-                <Calendar size={18} color="#16A34A" />
-              </View>
-              <Text style={styles.planButtonText}>Plan This Week</Text>
-            </TouchableOpacity>
+
 
             
             <TouchableOpacity 
@@ -1102,16 +1094,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  planButton: {
-    backgroundColor: '#EFF6FF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  planButtonText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#3B82F6',
-  },
+
 });
 
 export default ShoppingScreen;

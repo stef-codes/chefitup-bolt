@@ -17,6 +17,8 @@ import CarbCounterModal from '../../components/CarbCounterModal';
 import BloodSugarModal from '../../components/BloodSugarModal';
 import { showToast } from '../../utils/toast';
 import { useProfileMenu } from '../../contexts/ProfileMenuContext';
+import { logEvent, logFeatureUsage } from '../../lib/eventLogger';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Recipe {
   id: number;
@@ -54,6 +56,7 @@ interface BloodSugarReading {
 
 const HomeScreen = () => {
   const { handleProfilePress } = useProfileMenu();
+  const { user, guestMode } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -259,11 +262,22 @@ const HomeScreen = () => {
   };
 
   const handleRecipePress = (recipe: Recipe) => {
+    logEvent('user_interaction', 'recipe_clicked', user?.id || null, {
+      recipe_id: recipe.id,
+      recipe_name: recipe.name,
+      screen: 'home'
+    }, guestMode);
     setSelectedRecipe(recipe);
     setModalVisible(true);
   };
 
   const handleAddToMealPlan = (recipe: Recipe, mealType: string, day: string) => {
+    logFeatureUsage('meal_planning', 'add_recipe', user?.id || null, {
+      recipe_id: recipe.id,
+      recipe_name: recipe.name,
+      meal_type: mealType,
+      day: day
+    }, guestMode);
     showToast({
       message: `Added to Meal Plan\n${recipe.name} has been added to your meal plan for ${mealType} on ${day}.`,
       backgroundColor: '#16A34A',
@@ -271,6 +285,11 @@ const HomeScreen = () => {
   };
 
   const handleCarbEntrySave = (entry: CarbEntry) => {
+    logFeatureUsage('carb_tracking', 'log_entry', user?.id || null, {
+      carbs: entry.carbs,
+      meal_type: entry.mealType,
+      food_name: entry.name
+    }, guestMode);
     setTodaysCarbEntries([...todaysCarbEntries, entry]);
     Alert.alert(
       'Carbs Logged!',
@@ -280,6 +299,11 @@ const HomeScreen = () => {
   };
 
   const handleBloodSugarSave = (reading: BloodSugarReading) => {
+    logFeatureUsage('blood_sugar_tracking', 'log_reading', user?.id || null, {
+      value: reading.value,
+      reading_type: reading.readingType,
+      meal_context: reading.mealContext
+    }, guestMode);
     setBloodSugarReadings([...bloodSugarReadings, reading]);
     Alert.alert(
       'Blood Sugar Logged!',
@@ -289,10 +313,18 @@ const HomeScreen = () => {
   };
 
   const handleSeeAllRecipes = () => {
+    logEvent('navigation', 'screen_navigation', user?.id || null, {
+      from_screen: 'home',
+      to_screen: 'recipes'
+    }, guestMode);
     router.push('/(tabs)/recipes');
   };
 
   const handleEditCarbs = () => {
+    logEvent('user_interaction', 'button_clicked', user?.id || null, {
+      button: 'edit_carbs',
+      screen: 'home'
+    }, guestMode);
     setIsEditingCarbs(true);
     setEditingCarbValue(todayStats.carbsConsumed.toString());
   };
@@ -300,6 +332,12 @@ const HomeScreen = () => {
   const handleSaveCarbs = () => {
     const newValue = parseFloat(editingCarbValue);
     if (!isNaN(newValue) && newValue >= 0) {
+      logFeatureUsage('carb_tracking', 'manual_adjustment', user?.id || null, {
+        old_value: todayStats.carbsConsumed,
+        new_value: newValue,
+        adjustment: newValue - todayStats.carbsConsumed
+      }, guestMode);
+      
       // Create a new entry to represent the manual adjustment
       const manualEntry: CarbEntry = {
         id: Date.now(),
@@ -341,6 +379,10 @@ const HomeScreen = () => {
   };
 
   const handleCancelEditCarbs = () => {
+    logEvent('user_interaction', 'button_clicked', user?.id || null, {
+      button: 'cancel_edit_carbs',
+      screen: 'home'
+    }, guestMode);
     setIsEditingCarbs(false);
     setEditingCarbValue('');
   };

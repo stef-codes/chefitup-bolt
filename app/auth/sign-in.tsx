@@ -13,6 +13,7 @@ import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import Toast from 'react-native-toast-message';
+import { logEvent, logError } from '../../lib/eventLogger';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ const SignIn = () => {
   const { signIn, signInWithGoogle, enterGuestMode } = useAuth();
 
   const handleSignIn = async () => {
+    logEvent('user_interaction', 'button_clicked', null, { button: 'sign_in', screen: 'auth_sign_in' });
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -32,6 +34,7 @@ const SignIn = () => {
     setLoading(false);
 
     if (error) {
+      logError('auth_error', error.message, null, { email });
       Toast.show({
         type: 'error',
         text1: 'Sign In Failed',

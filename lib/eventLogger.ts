@@ -38,9 +38,13 @@ export const logEvent = async (
       platform: Platform.OS,
       guest_mode: guestMode,
     };
-    await supabase.from('events').insert(eventData);
+    
+    const { error } = await supabase.from('events').insert(eventData);
+    if (error) {
+      console.warn('Failed to log event to Supabase:', error);
+    }
   } catch (error) {
-    console.error('Error logging event:', error);
+    console.warn('Error logging event (continuing without logging):', error);
   }
 };
 
@@ -60,9 +64,13 @@ export const logFeatureUsage = async (
       timestamp: new Date().toISOString(),
       guest_mode: guestMode,
     };
-    await supabase.from('feature_usage').insert(featureData);
+    
+    const { error } = await supabase.from('feature_usage').insert(featureData);
+    if (error) {
+      console.warn('Failed to log feature usage to Supabase:', error);
+    }
   } catch (error) {
-    console.error('Error logging feature usage:', error);
+    console.warn('Error logging feature usage (continuing without logging):', error);
   }
 };
 
@@ -86,8 +94,12 @@ export const logError = async (
       platform: Platform.OS,
       guest_mode: guestMode,
     };
-    await supabase.from('error_logs').insert(errorData);
+    
+    const { error } = await supabase.from('error_logs').insert(errorData);
+    if (error) {
+      console.warn('Failed to log error to Supabase:', error);
+    }
   } catch (error) {
-    console.error('Error logging error:', error);
+    console.warn('Error logging error (continuing without logging):', error);
   }
 }; 

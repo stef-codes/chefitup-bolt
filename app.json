@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
+    "name": "ChefItUp",
     "slug": "bolt-expo-nativewind",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.elementalbytes.chefitup"
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +33,15 @@
     },
     "owner": "elementalbytes",
     "android": {
-      "package": "com.elementalbytes.boltexponativewind"
+      "package": "com.elementalbytes.chefitup",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#16A34A"
+      },
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     }
   }
 }

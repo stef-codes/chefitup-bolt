@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { UserProvider } from '../contexts/UserContext';
 import { ProfileMenuProvider } from '../contexts/ProfileMenuContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -81,12 +82,14 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <ProfileMenuProvider>
-          <RootLayoutNav />
-        </ProfileMenuProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <ProfileMenuProvider>
+            <RootLayoutNav />
+          </ProfileMenuProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

@@ -60,9 +60,9 @@ export const useUserStorage = () => {
 
   // Load user profile from storage
   const loadUserProfile = async (): Promise<UserProfile | null> => {
-    if (guestMode) {
-      // In guest mode, load or create guest profile
-      try {
+    try {
+      if (guestMode) {
+        // In guest mode, load or create guest profile
         const storedGuestProfile = await memoryStorage.getItem(GUEST_PROFILE_KEY);
         if (storedGuestProfile) {
           const profile = JSON.parse(storedGuestProfile);
@@ -77,15 +77,10 @@ export const useUserStorage = () => {
           setIsOnboardingCompleted(true);
           return guestProfile;
         }
-      } catch (error) {
-        console.error('Error loading guest profile:', error);
-        return null;
       }
-    }
 
-    if (!user) return null;
+      if (!user) return null;
 
-    try {
       // Try to load from Supabase first
       const { data, error } = await supabase
         .from('profiles')
@@ -93,7 +88,18 @@ export const useUserStorage = () => {
         .eq('id', user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Supabase error loading profile, falling back to local storage:', error);
+        // Fallback to local storage
+        const storedProfile = await memoryStorage.getItem(USER_PROFILE_KEY);
+        if (storedProfile) {
+          const profile = JSON.parse(storedProfile);
+          setUserProfile(profile);
+          setIsOnboardingCompleted(!!profile.diabetesType);
+          return profile;
+        }
+        return null;
+      }
 
       if (data) {
         const profile: UserProfile = {
@@ -129,42 +135,48 @@ export const useUserStorage = () => {
       // Fallback to local storage
       const storedProfile = await memoryStorage.getItem(USER_PROFILE_KEY);
       if (storedProfile) {
-        return JSON.parse(storedProfile);
+        const profile = JSON.parse(storedProfile);
+        setUserProfile(profile);
+        setIsOnboardingCompleted(!!profile.diabetesType);
+        return profile;
       }
       return null;
     } catch (error) {
       console.error('Error loading user profile:', error);
+      // Try to load from local storage as last resort
+      try {
+        const storedProfile = await memoryStorage.getItem(USER_PROFILE_KEY);
+        if (storedProfile) {
+          const profile = JSON.parse(storedProfile);
+          setUserProfile(profile);
+          setIsOnboardingCompleted(!!profile.diabetesType);
+          return profile;
+        }
+      } catch (localError) {
+        console.error('Error loading from local storage:', localError);
+      }
       return null;
     }
   };
 
   // Save user profile to storage
   const saveUserProfile = async (profile: UserProfile): Promise<boolean> => {
-    console.log('saveUserProfile called with profile:', profile);
-    console.log('Current user:', user);
-    console.log('Guest mode:', guestMode);
-    
-    if (guestMode) {
-      // In guest mode, save to local storage only
-      try {
+    try {
+      if (guestMode) {
+        // In guest mode, save to local storage only
         await memoryStorage.setItem(GUEST_PROFILE_KEY, JSON.stringify(profile));
         setUserProfile(profile);
-        console.log('Guest profile saved to local storage');
         return true;
-      } catch (error) {
-        console.error('Error saving guest profile:', error);
-        return false;
       }
-    }
-    
-    if (!user) {
-      console.error('No user found during profile save');
-      return false;
-    }
+      
+      if (!user) {
+        console.warn('No user found during profile save, saving to local storage only');
+        await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+        setUserProfile(profile);
+        return true;
+      }
 
-    try {
-      console.log('Attempting to save to Supabase...');
-      // Save to Supabase
+      // Try to save to Supabase first
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -185,28 +197,28 @@ export const useUserStorage = () => {
         });
 
       if (error) {
-        console.error('Supabase error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
-        
+        console.warn('Supabase error saving profile, falling back to local storage:', error);
         // Fallback: save to local storage only
-        console.log('Falling back to local storage only...');
         await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
         setUserProfile(profile);
-        console.log('Profile saved to local storage as fallback');
         return true; // Return true even if Supabase failed
       }
-
-      console.log('Profile saved to Supabase successfully');
 
       // Also save to local storage for offline access
       await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
       setUserProfile(profile);
-      console.log('Profile saved to local storage successfully');
       return true;
     } catch (error) {
       console.error('Error saving user profile:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
-      return false;
+      // Try to save to local storage as fallback
+      try {
+        await memoryStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+        setUserProfile(profile);
+        return true;
+      } catch (localError) {
+        console.error('Error saving to local storage:', localError);
+        return false;
+      }
     }
   };
 
@@ -227,13 +239,9 @@ export const useUserStorage = () => {
 
   // Save onboarding data and mark as completed
   const completeOnboarding = async (onboardingData: OnboardingData): Promise<boolean> => {
-    console.log('completeOnboarding called with data:', onboardingData);
-    console.log('Current user:', user);
-    console.log('Guest mode:', guestMode);
-    
-    if (guestMode) {
-      // In guest mode, update guest profile with onboarding data
-      try {
+    try {
+      if (guestMode) {
+        // In guest mode, update guest profile with onboarding data
         const currentProfile = userProfile || createGuestProfile();
         const updatedProfile: UserProfile = {
           ...currentProfile,
@@ -250,21 +258,40 @@ export const useUserStorage = () => {
         if (success) {
           await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
           setIsOnboardingCompleted(true);
-          console.log('Guest onboarding completed successfully');
         }
         return success;
-      } catch (error) {
-        console.error('Error completing guest onboarding:', error);
-        return false;
       }
-    }
-    
-    if (!user) {
-      console.error('No user found during onboarding completion');
-      return false;
-    }
+      
+      if (!user) {
+        console.warn('No user found during onboarding completion, saving to local storage only');
+        const newProfile: UserProfile = {
+          name: onboardingData.name || '',
+          email: 'guest@chefitup.com',
+          avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+          ...onboardingData,
+          joinDate: new Date().toISOString(),
+          preferences: {
+            notifications: true,
+            mealReminders: true,
+            carbTracking: true,
+            bloodSugarTracking: true,
+          },
+          stats: {
+            mealsPrepped: 0,
+            recipesTried: 0,
+            streakDays: 0,
+            avgDailyCarbs: 0,
+          },
+        };
 
-    try {
+        const success = await saveUserProfile(newProfile);
+        if (success) {
+          await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+          setIsOnboardingCompleted(true);
+        }
+        return success;
+      }
+
       const newProfile: UserProfile = {
         name: onboardingData.name || '',
         email: user.email || '',
@@ -285,14 +312,11 @@ export const useUserStorage = () => {
         },
       };
 
-      console.log('Attempting to save profile:', newProfile);
       const success = await saveUserProfile(newProfile);
       
       if (success) {
-        console.log('Profile saved successfully, marking onboarding as completed');
         await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
         setIsOnboardingCompleted(true);
-        console.log('Onboarding completed successfully');
       }
       return success;
     } catch (error) {

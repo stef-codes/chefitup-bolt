@@ -25,20 +25,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [guestMode, setGuestMode] = useState(false);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setGuestMode(false); // Exit guest mode when user signs in
-        setLoading(false);
+        try {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setGuestMode(false); // Exit guest mode when user signs in
+          setLoading(false);
+        } catch (error) {
+          console.error('Error in auth state change:', error);
+          setLoading(false);
+        }
       }
     );
 

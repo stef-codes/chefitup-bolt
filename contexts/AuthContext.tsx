@@ -6,11 +6,14 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  guestMode: boolean;
   signUp: (email: string, password: string, profileData: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  enterGuestMode: () => void;
+  exitGuestMode: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [guestMode, setGuestMode] = useState(false);
 
   useEffect(() => {
     // Get initial session
@@ -33,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setGuestMode(false); // Exit guest mode when user signs in
         setLoading(false);
       }
     );
@@ -83,6 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setGuestMode(false); // Exit guest mode when signing out
   };
 
   const resetPassword = async (email: string) => {
@@ -92,16 +98,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const enterGuestMode = () => {
+    setGuestMode(true);
+    setSession(null);
+    setUser(null);
+  };
+
+  const exitGuestMode = () => {
+    setGuestMode(false);
+  };
+
   return (
     <AuthContext.Provider value={{
       session,
       user,
       loading,
+      guestMode,
       signUp,
       signIn,
       signInWithGoogle,
       signOut,
       resetPassword,
+      enterGuestMode,
+      exitGuestMode,
     }}>
       {children}
     </AuthContext.Provider>

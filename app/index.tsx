@@ -5,13 +5,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
 
 export default function Index() {
-  const { session, loading } = useAuth();
+  const { session, loading, guestMode } = useAuth();
   const { isOnboardingCompleted } = useUser();
 
   useEffect(() => {
     if (loading) return;
 
-    if (!session) {
+    if (guestMode) {
+      // User is in guest mode, go directly to main app
+      router.replace('/(tabs)');
+    } else if (!session) {
       // User is not authenticated, redirect to sign in
       router.replace('/auth/sign-in');
     } else if (!isOnboardingCompleted) {
@@ -21,7 +24,7 @@ export default function Index() {
       // User is authenticated and has completed onboarding
       router.replace('/(tabs)');
     }
-  }, [session, loading, isOnboardingCompleted]);
+  }, [session, loading, isOnboardingCompleted, guestMode]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>

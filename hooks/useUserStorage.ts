@@ -24,15 +24,65 @@ const memoryStorage = new MemoryStorage();
 
 const USER_PROFILE_KEY = '@user_profile';
 const ONBOARDING_COMPLETED_KEY = '@onboarding_completed';
+const GUEST_PROFILE_KEY = '@guest_profile';
 
 export const useUserStorage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
-  const { user } = useAuth();
+  const { user, guestMode } = useAuth();
+
+  // Create default guest profile
+  const createGuestProfile = (): UserProfile => ({
+    name: 'Guest User',
+    email: 'guest@chefitup.com',
+    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop&crop=face',
+    diabetesType: 'Type 2',
+    age: '30',
+    carbBudget: '150',
+    restrictions: [],
+    goals: ['Weight Management'],
+    cookingLevel: 'Beginner',
+    joinDate: new Date().toISOString(),
+    preferences: {
+      notifications: true,
+      mealReminders: true,
+      carbTracking: true,
+      bloodSugarTracking: true,
+    },
+    stats: {
+      mealsPrepped: 0,
+      recipesTried: 0,
+      streakDays: 0,
+      avgDailyCarbs: 0,
+    },
+  });
 
   // Load user profile from storage
   const loadUserProfile = async (): Promise<UserProfile | null> => {
+    if (guestMode) {
+      // In guest mode, load or create guest profile
+      try {
+        const storedGuestProfile = await memoryStorage.getItem(GUEST_PROFILE_KEY);
+        if (storedGuestProfile) {
+          const profile = JSON.parse(storedGuestProfile);
+          setUserProfile(profile);
+          setIsOnboardingCompleted(true);
+          return profile;
+        } else {
+          // Create new guest profile
+          const guestProfile = createGuestProfile();
+          await memoryStorage.setItem(GUEST_PROFILE_KEY, JSON.stringify(guestProfile));
+          setUserProfile(guestProfile);
+          setIsOnboardingCompleted(true);
+          return guestProfile;
+        }
+      } catch (error) {
+        console.error('Error loading guest profile:', error);
+        return null;
+      }
+    }
+
     if (!user) return null;
 
     try {
@@ -92,6 +142,20 @@ export const useUserStorage = () => {
   const saveUserProfile = async (profile: UserProfile): Promise<boolean> => {
     console.log('saveUserProfile called with profile:', profile);
     console.log('Current user:', user);
+    console.log('Guest mode:', guestMode);
+    
+    if (guestMode) {
+      // In guest mode, save to local storage only
+      try {
+        await memoryStorage.setItem(GUEST_PROFILE_KEY, JSON.stringify(profile));
+        setUserProfile(profile);
+        console.log('Guest profile saved to local storage');
+        return true;
+      } catch (error) {
+        console.error('Error saving guest profile:', error);
+        return false;
+      }
+    }
     
     if (!user) {
       console.error('No user found during profile save');
@@ -165,6 +229,35 @@ export const useUserStorage = () => {
   const completeOnboarding = async (onboardingData: OnboardingData): Promise<boolean> => {
     console.log('completeOnboarding called with data:', onboardingData);
     console.log('Current user:', user);
+    console.log('Guest mode:', guestMode);
+    
+    if (guestMode) {
+      // In guest mode, update guest profile with onboarding data
+      try {
+        const currentProfile = userProfile || createGuestProfile();
+        const updatedProfile: UserProfile = {
+          ...currentProfile,
+          name: onboardingData.name || currentProfile.name,
+          diabetesType: onboardingData.diabetesType || currentProfile.diabetesType,
+          age: onboardingData.age || currentProfile.age,
+          carbBudget: onboardingData.carbBudget || currentProfile.carbBudget,
+          restrictions: onboardingData.restrictions || currentProfile.restrictions,
+          goals: onboardingData.goals || currentProfile.goals,
+          cookingLevel: onboardingData.cookingLevel || currentProfile.cookingLevel,
+        };
+
+        const success = await saveUserProfile(updatedProfile);
+        if (success) {
+          await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+          setIsOnboardingCompleted(true);
+          console.log('Guest onboarding completed successfully');
+        }
+        return success;
+      } catch (error) {
+        console.error('Error completing guest onboarding:', error);
+        return false;
+      }
+    }
     
     if (!user) {
       console.error('No user found during onboarding completion');
@@ -199,14 +292,11 @@ export const useUserStorage = () => {
         console.log('Profile saved successfully, marking onboarding as completed');
         await memoryStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
         setIsOnboardingCompleted(true);
-      } else {
-        console.error('Failed to save user profile');
+        console.log('Onboarding completed successfully');
       }
-      
       return success;
     } catch (error) {
       console.error('Error completing onboarding:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
       return false;
     }
   };
@@ -225,10 +315,19 @@ export const useUserStorage = () => {
   // Clear user data (for logout/reset)
   const clearUserData = async (): Promise<boolean> => {
     try {
-      await memoryStorage.deleteItem(USER_PROFILE_KEY);
-      await memoryStorage.deleteItem(ONBOARDING_COMPLETED_KEY);
-      setUserProfile(null);
-      setIsOnboardingCompleted(false);
+      if (guestMode) {
+        // Clear guest data
+        await memoryStorage.deleteItem(GUEST_PROFILE_KEY);
+        await memoryStorage.deleteItem(ONBOARDING_COMPLETED_KEY);
+        setUserProfile(null);
+        setIsOnboardingCompleted(false);
+      } else {
+        // Clear authenticated user data
+        await memoryStorage.deleteItem(USER_PROFILE_KEY);
+        await memoryStorage.deleteItem(ONBOARDING_COMPLETED_KEY);
+        setUserProfile(null);
+        setIsOnboardingCompleted(false);
+      }
       return true;
     } catch (error) {
       console.error('Error clearing user data:', error);
@@ -241,7 +340,17 @@ export const useUserStorage = () => {
     const initializeData = async () => {
       setIsLoading(true);
       try {
-        if (user) {
+        if (guestMode) {
+          // Initialize guest mode data
+          const [profile, onboardingStatus] = await Promise.all([
+            loadUserProfile(),
+            checkOnboardingStatus(),
+          ]);
+          
+          setUserProfile(profile);
+          setIsOnboardingCompleted(onboardingStatus);
+        } else if (user) {
+          // Initialize authenticated user data
           const [profile, onboardingStatus] = await Promise.all([
             loadUserProfile(),
             checkOnboardingStatus(),
@@ -250,6 +359,7 @@ export const useUserStorage = () => {
           setUserProfile(profile);
           setIsOnboardingCompleted(onboardingStatus);
         } else {
+          // No user and not in guest mode
           setUserProfile(null);
           setIsOnboardingCompleted(false);
         }
@@ -261,7 +371,7 @@ export const useUserStorage = () => {
     };
 
     initializeData();
-  }, [user]);
+  }, [user, guestMode]);
 
   return {
     userProfile,

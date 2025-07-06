@@ -19,7 +19,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, enterGuestMode } = useAuth();
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -62,6 +62,11 @@ const SignIn = () => {
     } finally {
       setGoogleLoading(false);
     }
+  };
+
+  const handleGuestMode = () => {
+    enterGuestMode();
+    router.replace('/');
   };
 
   return (
@@ -118,6 +123,16 @@ const SignIn = () => {
           >
             <Text style={styles.googleButtonText}>
               {googleLoading ? 'Signing in...' : 'Continue with Google'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Guest Mode Button */}
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={handleGuestMode}
+          >
+            <Text style={styles.guestButtonText}>
+              Continue as Guest
             </Text>
           </TouchableOpacity>
 
@@ -231,6 +246,18 @@ const styles = StyleSheet.create({
   },
   googleButtonText: {
     color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+  },
+  guestButton: {
+    backgroundColor: '#E5E7EB',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  guestButtonText: {
+    color: '#1F2937',
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
   },

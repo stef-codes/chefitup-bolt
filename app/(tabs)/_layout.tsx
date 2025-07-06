@@ -5,7 +5,7 @@ import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 import { useRouter } from 'expo-router';
 
 export default function TabLayout() {
-  const { showProfileMenu, setShowProfileMenu, handleSignOut } = useProfileMenu();
+  const { showProfileMenu, setShowProfileMenu, handleSignOut, handleSignIn, guestMode } = useProfileMenu();
   const router = useRouter();
 
   return (
@@ -68,10 +68,10 @@ export default function TabLayout() {
                 borderTopColor: '#E5E7EB',
                 marginTop: 8,
               }}
-              onPress={handleSignOut}
+              onPress={guestMode ? handleSignIn : handleSignOut}
             >
-              <Text style={{ fontSize: 16, fontFamily: 'Inter-Medium', color: '#EF4444' }}>
-                Sign Out
+              <Text style={{ fontSize: 16, fontFamily: 'Inter-Medium', color: guestMode ? '#16A34A' : '#EF4444' }}>
+                {guestMode ? 'Sign In' : 'Sign Out'}
               </Text>
             </TouchableOpacity>
           </View>

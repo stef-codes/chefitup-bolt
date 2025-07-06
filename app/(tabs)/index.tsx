@@ -19,6 +19,7 @@ import { showToast } from '../../utils/toast';
 import { useProfileMenu } from '../../contexts/ProfileMenuContext';
 import { logEvent, logFeatureUsage } from '../../lib/eventLogger';
 import { useAuth } from '../../contexts/AuthContext';
+import { testEventLogging } from '../../lib/test-event-logging';
 
 interface Recipe {
   id: number;
@@ -387,6 +388,16 @@ const HomeScreen = () => {
     setEditingCarbValue('');
   };
 
+  const handleTestEventLogging = async () => {
+    console.log('🧪 Starting event logging test...');
+    await testEventLogging();
+    Alert.alert(
+      'Test Complete',
+      'Check the console for event logging test results.',
+      [{ text: 'OK' }]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -582,6 +593,15 @@ const HomeScreen = () => {
                 <Droplets size={24} color="#16A34A" />
               </View>
               <Text style={styles.actionText}>Log Blood Sugar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleTestEventLogging}
+            >
+              <View>
+                <Activity size={24} color="#16A34A" />
+              </View>
+              <Text style={styles.actionText}>Test Logging</Text>
             </TouchableOpacity>
           </View>
         </View>

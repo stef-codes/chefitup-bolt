@@ -23,7 +23,7 @@ const SignIn = () => {
   const { signIn, signInWithGoogle, enterGuestMode } = useAuth();
 
   const handleSignIn = async () => {
-    logEvent('user_interaction', 'button_clicked', null, { button: 'sign_in', screen: 'auth_sign_in' });
+    logEvent('user_interaction', 'button_clicked', null, { button: 'sign_in', screen: 'auth_sign_in' }, false);
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -34,7 +34,7 @@ const SignIn = () => {
     setLoading(false);
 
     if (error) {
-      logError('auth_error', error.message, null, { email });
+      logError('auth_error', error.message, null, { email }, undefined, false);
       Toast.show({
         type: 'error',
         text1: 'Sign In Failed',

@@ -30,6 +30,8 @@ import BloodSugarModal from '../../components/BloodSugarModal';
 import CustomMealModal from '../../components/CustomMealModal';
 import { useRouter } from 'expo-router';
 import { useProfileMenu } from '../../contexts/ProfileMenuContext';
+import { logEvent, logFeatureUsage } from '../../lib/eventLogger';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface NutritionEntry {
   id: number;
@@ -68,6 +70,7 @@ interface FoodItem {
 
 const NutritionScreen = () => {
   const { handleProfilePress } = useProfileMenu();
+  const { user, guestMode } = useAuth();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyEntries, setDailyEntries] = useState<NutritionEntry[]>([]);
@@ -181,11 +184,21 @@ const NutritionScreen = () => {
       mealType: selectedMealType,
     };
 
+    // Log nutrition tracking event
+    logFeatureUsage('nutrition_tracking', 'add_food_entry', user?.id || null, {
+      food_name: food.name,
+      carbs: newEntry.carbs,
+      protein: newEntry.protein,
+      calories: newEntry.calories,
+      meal_type: selectedMealType,
+      serving_multiplier: servingMultiplier
+    }, guestMode);
+
     setDailyEntries(prev => [...prev, newEntry]);
     setAddModalVisible(false);
     setSearchQuery('');
     setCustomServing('1');
-  }, [customServing, selectedMealType]);
+  }, [customServing, selectedMealType, user?.id, guestMode]);
 
   const removeEntry = useCallback((id: number) => {
     Alert.alert(
@@ -201,6 +214,13 @@ const NutritionScreen = () => {
   }, []);
 
   const handleBloodSugarSave = (reading: BloodSugarReading) => {
+    // Log blood sugar tracking event
+    logFeatureUsage('blood_sugar_tracking', 'log_reading', user?.id || null, {
+      value: reading.value,
+      reading_type: reading.readingType,
+      meal_context: reading.mealContext
+    }, guestMode);
+
     setBloodSugarReadings(prev => [...prev, reading]);
     setTimeout(() => {
       Alert.alert(

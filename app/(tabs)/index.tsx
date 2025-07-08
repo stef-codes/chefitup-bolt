@@ -594,15 +594,6 @@ const HomeScreen = () => {
               </View>
               <Text style={styles.actionText}>Log Blood Sugar</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={handleTestEventLogging}
-            >
-              <View>
-                <Activity size={24} color="#16A34A" />
-              </View>
-              <Text style={styles.actionText}>Test Logging</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
